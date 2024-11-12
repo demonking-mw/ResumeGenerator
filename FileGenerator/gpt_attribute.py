@@ -10,13 +10,14 @@ class GPT_Attribute:
     """
     set attribute list through gpt.
     """
-    def get_gpt_out(self, input_message: list) -> str:
+    def get_gpt_out(self, input_message: list, gpt_model: str) -> str:
         """
         Gets the output from ChatGPT with a given input
         """
+        print("COMMENCE GPT RETRIVAL ATTEMPT")
         client = OpenAI()
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=gpt_model,
             messages=input_message)
         print("TOKEN_USED:")
         print(completion.usage.total_tokens)
@@ -88,13 +89,11 @@ class GPT_Attribute:
             result.append([item[0], value])
         return result
 
-    def __init__(self, att_list: list[list]) -> None:
+    def __init__(self, att_list: list[list], model_name: str) -> None:
         self.att_list = att_list
         self.opening_line = "Analyze the following job description, give each trait/skill in the list below a value between 0 to 9, inclusive. The value reflects how much the skill helps in getting the job, and how much the recruiter would value the skill. You should also consider how relevant the skill is to the job, as skills in proximity to what the recruiter desires should be awarded with some value."
         self.answer_style_guide = "your response must cover each trait in the format of:"
-        self.first_response_dic = self.get_gpt_out(self.get_init_prompt())
+        self.first_response_dic = self.get_gpt_out(self.get_init_prompt(), model_name)
         print(self.first_response_dic)
         self.first_response = self.first_response_dic.content
         self.gpt_modded_list = self.fill_list()
-
-

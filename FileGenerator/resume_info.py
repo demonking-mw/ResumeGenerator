@@ -10,6 +10,7 @@ where the value is fixed to the range of 0-10 inclusive
 Default attribute value should be a 0
 """
 
+import os
 import csv
 import dataclasses
 import math
@@ -61,20 +62,22 @@ class ResumeInfo:
         result += skills_data_class.height_buffer
         return result
 
-    def read_file(self, file_name: str) -> list[list]:
+    def read_file(self, file_name: str, folder: str) -> list[list]:
         """
         Returns a csv file in the format of a 2d array
         """
-        return list(csv.reader(open(file_name, encoding="utf-8")))
+        fn = 'ResumeGenerator/Informations/' + folder + "/" + file_name
+        abs_file_path = os.path.abspath(fn)
+        return list(csv.reader(open(abs_file_path, 'r', encoding="utf-8")))
 
-    def get_all(self, section_filenames) -> list[list[list]]:
+    def get_all(self, section_filenames: list, section_folder_name: str) -> list[list[list]]:
         """
         Gets all the files provided in a 3d list:
         A list of 2d lists, each is a section
         """
         all_info = []
         for filename in section_filenames:
-            all_info.append(self.read_file(filename))
+            all_info.append(self.read_file(filename, section_folder_name))
         return all_info
 
     def parse_heading(self, info_list: list[list]) -> AuxSectionsInfo:
@@ -177,7 +180,7 @@ class ResumeInfo:
             refined_list,
             bullet_point=bull_point)
 
-    def get_mega_list(self, 
+    def get_mega_list(self,
                       sec_info: list[standard_section.StandardSection]
                       ) -> list:
         result = []
@@ -203,7 +206,7 @@ class ResumeInfo:
                     result.append(att)
         return result
 
-    def get_desire(self) -> list[list]:
+    def get_desire(self, gpt_model: str) -> list[list]:
         """
         INTEGRATE CHATGPT HERE IN THE FUTURE TO 
         AUTOMATICALLY GET DESIRE BASED ON THE REQUIREMENT
@@ -214,7 +217,7 @@ class ResumeInfo:
         for att in self.all_att_in_skills:
             empty_template.append([att, 1])
         # CHATGPT HERE
-        gpt_response = gpt_attribute.GPT_Attribute(empty_template)
+        gpt_response = gpt_attribute.GPT_Attribute(empty_template, gpt_model)
         result = gpt_response.gpt_modded_list
         print("GET_DESIRED:")
         print(result)
@@ -274,7 +277,7 @@ class ResumeInfo:
             result[point[0]].append(point[1])
         return result
 
-    def __init__(self) -> None:
+    def __init__(self, folder_name: str, gpt_model: str) -> None:
         """
         Defining the ResumeInfo
         Grab information from file
@@ -301,7 +304,7 @@ class ResumeInfo:
         ################################################################
         # Parse
         self.height_list = []
-        self.all_info_list = self.get_all(self.section_filenames)
+        self.all_info_list = self.get_all(self.section_filenames, folder_name)
         self.skills_info = self.parse_skills(self.all_info_list[1])
         self.all_edu_info = self.parse_standard(
                                             "EDUCATION",
@@ -332,9 +335,9 @@ class ResumeInfo:
                                                       self.all_exp_info,
                                                       self.all_proj_info])
         self.all_att_in_skills = self.get_all_skills_att()
-        self.desired_skillset = self.get_desire()
+        self.desired_skillset = self.get_desire(gpt_model)
         self.resume_selection_list = self.generate_resume_list()
-        
+
         # Add
         self.edu_info = self.mod_standard(self.all_edu_info,
                                           self.resume_selection_list[0])
