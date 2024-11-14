@@ -1,12 +1,9 @@
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Frame, Paragraph, KeepInFrame, Spacer
+from reportlab.platypus import Frame, Paragraph, Spacer
 from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-import standard_section
-import resume_info
-import fonts
+from . import resume_info
+from . import fonts
 
 class ResumeBuilder:
     '''

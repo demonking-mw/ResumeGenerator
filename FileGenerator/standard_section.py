@@ -2,12 +2,12 @@
 """
 A standard section of the resume in the format of "EXPERIENCE" tab
 """
-
+import math
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
 from reportlab.pdfbase.pdfmetrics import stringWidth
-import math
+
 
 
 class StandardSection:

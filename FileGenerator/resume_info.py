@@ -14,10 +14,10 @@ import os
 import csv
 import dataclasses
 import math
-import fonts
-import standard_section
+from . import fonts
+from . import standard_section
 from reportlab.lib.pagesizes import A4
-import gpt_attribute
+from . import gpt_attribute
 
 
 @dataclasses.dataclass
