@@ -18,6 +18,7 @@ from . import fonts
 from . import standard_section
 from reportlab.lib.pagesizes import A4
 from . import gpt_attribute
+from . import file_parse
 
 
 @dataclasses.dataclass
@@ -61,24 +62,6 @@ class ResumeInfo:
         result += vert * self.custom_fonts.point_right.leading
         result += skills_data_class.height_buffer
         return result
-
-    def read_file(self, file_name: str, folder: str) -> list[list]:
-        """
-        Returns a csv file in the format of a 2d array
-        """
-        fn = 'ResumeGenerator/Informations/' + folder + "/" + file_name
-        abs_file_path = os.path.abspath(fn)
-        return list(csv.reader(open(abs_file_path, 'r', encoding="utf-8")))
-
-    def get_all(self, section_filenames: list, section_folder_name: str) -> list[list[list]]:
-        """
-        Gets all the files provided in a 3d list:
-        A list of 2d lists, each is a section
-        """
-        all_info = []
-        for filename in section_filenames:
-            all_info.append(self.read_file(filename, section_folder_name))
-        return all_info
 
     def parse_heading(self, info_list: list[list]) -> AuxSectionsInfo:
         """
@@ -197,7 +180,6 @@ class ResumeInfo:
         potentially useful in the get_desired_traits
         """
         result = []
-        print("THIS IS THIS")
         print(self.skills_att_list)
         print()
         for skill in self.skills_att_list:
@@ -208,8 +190,7 @@ class ResumeInfo:
 
     def get_desire(self, gpt_model: str) -> list[list]:
         """
-        INTEGRATE CHATGPT HERE IN THE FUTURE TO 
-        AUTOMATICALLY GET DESIRE BASED ON THE REQUIREMENT
+        GPT intergration
         """
         # TEMPORARY: SIMPLE SOLUTION: everything in the skills section
         ################################################
@@ -304,7 +285,8 @@ class ResumeInfo:
         ################################################################
         # Parse
         self.height_list = []
-        self.all_info_list = self.get_all(self.section_filenames, folder_name)
+        self.file_parser = file_parse.FileAccMod()
+        self.all_info_list = self.file_parser.get_all(self.section_filenames, folder_name)
         self.skills_info = self.parse_skills(self.all_info_list[1])
         self.all_edu_info = self.parse_standard(
                                             "EDUCATION",
