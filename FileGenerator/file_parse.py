@@ -92,3 +92,15 @@ class FileAccMod:
         with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
             writer = csv.writer(file)
             writer.writerows(content)
+
+# f = FileAccMod()
+# sf = [["PROGRAMMING", 1], ["COOKING", 2]]
+# f.add_line_ss(
+#     sf,
+#     "Strong",
+#     "EXPERIENCE.csv",
+#     "Adding something to resume",
+#     "2025",
+#     ["see, now I can add stuff to the resume", "nah I want more shit"],
+#     location=100000,
+# )
