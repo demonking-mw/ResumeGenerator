@@ -10,13 +10,12 @@ where the value is fixed to the range of 0-10 inclusive
 Default attribute value should be a 0
 """
 
-import os
-import csv
 import dataclasses
 import math
+from reportlab.lib.pagesizes import A4
+
 from . import fonts
 from . import standard_section
-from reportlab.lib.pagesizes import A4
 from . import gpt_attribute
 from . import file_parse
 
@@ -124,7 +123,7 @@ class ResumeInfo:
         )
 
     def parse_standard(
-            self, target_type: str, info_list: list[list], is_bullet_point
+            self, target_type: str, info_list: list[list]
             ) -> standard_section.StandardSection:
         """
         Parse a standard section, can be education, experience, or porjects
@@ -138,6 +137,10 @@ class ResumeInfo:
             print("ERROR: " + target_type + " FILE MISMATCH")
             return None
         selection = list(range(len(info_list)-1))
+        if info_list[0][1] == "BP":
+            is_bp = True
+        else:
+            is_bp = False
 
         selected_info = []
         for i in selection:
@@ -145,7 +148,7 @@ class ResumeInfo:
         return standard_section.StandardSection(
             target_type,
             selected_info,
-            bullet_point=is_bullet_point)
+            bullet_point=is_bp)
 
     def mod_standard(self, standard_sec: standard_section.StandardSection,
                      selection_list: list) -> standard_section.StandardSection:
@@ -166,6 +169,9 @@ class ResumeInfo:
     def get_mega_list(self,
                       sec_info: list[standard_section.StandardSection]
                       ) -> list:
+        '''
+        Gets an overarching list containing everything abount the entir resume
+        '''
         result = []
         for i in range(len(sec_info)):
             sub = []
@@ -272,7 +278,7 @@ class ResumeInfo:
         ##################################################################
 
         self.custom_fonts = fonts.AllFonts()
-        self.topicList = ["HEADING", "SKILLS", "EDUCATION",
+        self.topic_list = ["HEADING", "SKILLS", "EDUCATION",
                           "EXPERIENCE", "PROJECTS"]
         self.section_filenames = ["HEADING.csv",
                                   "SKILLS.csv",
@@ -290,16 +296,13 @@ class ResumeInfo:
         self.skills_info = self.parse_skills(self.all_info_list[1])
         self.all_edu_info = self.parse_standard(
                                             "EDUCATION",
-                                            self.all_info_list[2],
-                                            False)
+                                            self.all_info_list[2])
         self.all_exp_info = self.parse_standard(
                                             "EXPERIENCE",
-                                            self.all_info_list[3],
-                                            False)
+                                            self.all_info_list[3])
         self.all_proj_info = self.parse_standard(
                                             "PROJECT",
-                                            self.all_info_list[4],
-                                            True)
+                                            self.all_info_list[4])
         self.heading_info = self.parse_heading(self.all_info_list[0])
         print("DEBUG_LENGTH")
         print(self.all_info_list[3][2])

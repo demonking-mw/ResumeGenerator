@@ -1,7 +1,7 @@
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Frame, Paragraph, Spacer
 from reportlab.pdfgen import canvas
+import os
 from . import resume_info
 from . import fonts
 
@@ -65,10 +65,14 @@ class ResumeBuilder:
         return section_content
 
     def build(self) -> None:
-        styles = getSampleStyleSheet()
-
+        '''
+        builds the pdf
+        '''
+        # Make the file path
+        downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
+        pdf_path = os.path.join(downloads_folder, pdf_name)
         # Prepare a canvas object
-        c = canvas.Canvas(pdf_name, pagesize=A4)
+        c = canvas.Canvas(pdf_path, pagesize=A4)
         c.setLineWidth(0.3)
 
         frames = self.build_all_frames(
@@ -127,7 +131,7 @@ class ResumeBuilder:
 # Parameters:
 #######################################
 print("start")
-pdf_name = "Resume11.pdf"
+pdf_name = "BobSmithResume1.pdf"
 side_margin = 25
 r = ResumeBuilder(pdf_name, side_margin, "Accurate")
 r.build()

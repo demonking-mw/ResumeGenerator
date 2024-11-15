@@ -1,3 +1,7 @@
+'''
+Parse files. 
+file modification functions also implemented here
+'''
 import os
 import csv
 
@@ -5,7 +9,7 @@ class FileAccMod:
     """
     File read and modify
     """
-    def __init__(self, dominant_fp: str = 'ResumeGenerator/Informations/',
+    def __init__(self, dominant_fp: str = 'Informations/',
                  encoding: str = "utf-8") -> None:
         self.main_fp = dominant_fp
         self.encoding = encoding
@@ -41,7 +45,7 @@ class FileAccMod:
         """
         fn = self.main_fp + folder + "/" + file_name
         abs_file_path = os.path.abspath(fn)
-        return list(csv.reader(open(abs_file_path, "r", encoding="utf-8")))
+        return list(csv.reader(open(abs_file_path, "r", encoding=self.encoding)))
 
     def get_all(
         self, section_filenames: list, section_folder_name: str
@@ -55,6 +59,36 @@ class FileAccMod:
             all_info.append(self.read_file(filename, section_folder_name))
         return all_info
 
-f = FileAccMod()
-sf = ["HEADING.csv", "SKILLS.csv", "EDUCATION.csv", "EXPERIENCE.csv", "PROJECTS.csv"]
-f.construct_folder(sf, "Strong", force_const=True)
+    def add_line_ss(
+        self,
+        attribute_list: list[list],
+        folder_name: str,
+        file_name: str,
+        header: str,
+        time: str,
+        descriptions: list,
+        location: int = 0,
+    ):
+        '''
+        add a line to a standard section. note: each item in attribute_list is a [str, int]
+        location describes where the item is put relative to other ones
+        enter an arbitrarily large number for location for the item to be placed last (say, 1000000)
+        '''
+        content = self.read_file(file_name, folder_name)
+        new_att = []
+        for att in attribute_list:
+            curr_att = "/=-z+f]j " + str(att[0]) + " " + str(att[1])
+            new_att.append(curr_att)
+        new_att.append(header)
+        new_att.append(time)
+        for desc in descriptions:
+            new_att.append(desc)
+        if location+1 > len(content):
+            location = len(content)-1
+        content.insert(location+1, new_att)
+
+        fn = self.main_fp + folder_name + '/' + file_name
+        abs_file_path = os.path.abspath(fn)
+        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+            writer = csv.writer(file)
+            writer.writerows(content)
