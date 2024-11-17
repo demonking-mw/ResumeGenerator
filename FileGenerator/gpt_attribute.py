@@ -71,8 +71,6 @@ class GPT_Attribute:
         # Check if the target was found and if there is a character after it
         if index != -1 and index + len(target) < len(gpt_result):
             character_after_target = gpt_result[index + len(target)+1]
-            print("DEBUG: CHAR_AFTER_TARGET is:")
-            print(character_after_target)
             result = int(character_after_target)
         else:
             print("ERROR")
@@ -94,6 +92,8 @@ class GPT_Attribute:
         self.opening_line = "Analyze the following job description, give each trait/skill in the list below a value between 0 to 9, inclusive. The value reflects how much the skill helps in getting the job, and how much the recruiter would value the skill. You should also consider how relevant the skill is to the job, as skills in proximity to what the recruiter desires should be awarded with some value."
         self.answer_style_guide = "your response must cover each trait in the format of:"
         self.first_response_dic = self.get_gpt_out(self.get_init_prompt(), model_name)
+        print("GPT RESPONSE:")
         print(self.first_response_dic)
+        print()
         self.first_response = self.first_response_dic.content
         self.gpt_modded_list = self.fill_list()
