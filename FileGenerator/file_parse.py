@@ -9,7 +9,7 @@ class FileAccMod:
     """
     File read and modify
     """
-    def __init__(self, dominant_fp: str = 'ResumeGenerator/Informations/',
+    def __init__(self, dominant_fp: str = 'Informations/',
                  encoding: str = "utf-8") -> None:
         self.main_fp = dominant_fp
         self.encoding = encoding
