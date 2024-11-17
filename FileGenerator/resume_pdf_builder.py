@@ -130,7 +130,6 @@ class ResumeBuilder:
 
 # Parameters:
 #######################################
-print("start")
 pdf_name = "BobSmithResume1.pdf"
 side_margin = 25
 r = ResumeBuilder(pdf_name, side_margin, "Accurate")

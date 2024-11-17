@@ -111,8 +111,6 @@ class ResumeInfo:
                 ts_sub2.append(info_list[i+1][k+1])
             ts_sub1.append(ts_sub2)
             ts_list.append(ts_sub1)
-        print("CHECK SKILLS OUTPUT")
-        print(ts_list)
         return AuxSectionsInfo(
             top_space=0,
             title="SKILLS",
@@ -206,8 +204,6 @@ class ResumeInfo:
         # CHATGPT HERE
         gpt_response = gpt_attribute.GPT_Attribute(empty_template, gpt_model)
         result = gpt_response.gpt_modded_list
-        print("GET_DESIRED:")
-        print(result)
         # Add mandatory_inclusion
         result.append(["MANDATORY_INCLUDE", 100000])
         return result
@@ -258,8 +254,6 @@ class ResumeInfo:
         # now unpack the selected array and return the right thing
 
         result = [[] for _ in range(len(self.sections_mega_list))]
-        print("point:")
-        print(selected[avail_height-1])
         for point in selected[avail_height-1]:
             result[point[0]].append(point[1])
         return result
@@ -304,8 +298,7 @@ class ResumeInfo:
                                             "PROJECT",
                                             self.all_info_list[4])
         self.heading_info = self.parse_heading(self.all_info_list[0])
-        print("DEBUG_LENGTH")
-        print(self.all_info_list[3][2])
+        
         # Deal with file
         self.existing_height = (
                         self.get_header_height(self.heading_info)
