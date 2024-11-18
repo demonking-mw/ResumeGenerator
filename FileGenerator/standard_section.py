@@ -195,7 +195,7 @@ class StandardSection:
             content_start = 0
             for n in range(len(self.raw_info_list[sec_index])):
                 splitted_list = self.raw_info_list[sec_index][n].split()
-                if (len(splitted_list) > 0):
+                if len(splitted_list) > 0:
                     if(splitted_list[0] == "/=-z+f]j"):
                         content_start += 1
                     else:

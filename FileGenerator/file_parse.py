@@ -14,6 +14,57 @@ class FileAccMod:
         self.main_fp = dominant_fp
         self.encoding = encoding
 
+    def mod_by_header_ss(self,
+        attribute_list: list[list],
+        folder_name: str,
+        file_name: str,
+        target_header: str,
+        time: str,
+        descriptions: list) -> None:
+        '''
+        Modify an item in the file by searching for its header
+        '''
+        content = self.read_file(file_name, folder_name)
+        row = 1
+        target_row_header = None
+        target_row_index = []
+        while row < len(content):
+            # loop through each row of the resume
+            col = 0
+            for item in content[row]:
+                splitted = item.split()
+                if len(splitted) > 0 and splitted[0] == "/=-z+f]j":
+                    col+=1
+                else:
+                    break
+            if target_header in content[row][col]:
+                target_row_index.append(row)
+                target_row_header = content[row][col]
+            row+=1
+        if len(target_row_index) == 0:
+            # FRONTEND: do something here since target is not found
+            print(target_header + " NOT FOUND IN FILE " + file_name)
+        elif len(target_row_index) == 1:
+            # FRONTEND: found row
+            new_att = []
+            for att in attribute_list:
+                curr_att = "/=-z+f]j " + str(att[0]) + " " + str(att[1])
+                new_att.append(curr_att)
+            new_att.append(target_row_header)
+            new_att.append(time)
+            for desc in descriptions:
+                new_att.append(desc)
+            content.pop(target_row_index[0])
+            content.insert(target_row_index[0], new_att)
+        else:
+            # FRONTEND: multiple items found, alert user
+            print("MULTIPLE ITEMS FOUND ON REPLACE ATTEMPT, REPLACE CANCELLED")
+        fn = self.main_fp + folder_name + "/" + file_name
+        abs_file_path = os.path.abspath(fn)
+        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+            writer = csv.writer(file)
+            writer.writerows(content)
+
     def construct_folder(
         self, section_filenames: list, section_folder_name: str,
         heading_top: int = 15, skills_top = 20, force_const: bool = False
@@ -92,15 +143,3 @@ class FileAccMod:
         with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
             writer = csv.writer(file)
             writer.writerows(content)
-
-# f = FileAccMod()
-# sf = [["PROGRAMMING", 1], ["COOKING", 2]]
-# f.add_line_ss(
-#     sf,
-#     "Strong",
-#     "EXPERIENCE.csv",
-#     "Adding something to resume",
-#     "2025",
-#     ["see, now I can add stuff to the resume", "nah I want more shit"],
-#     location=100000,
-# )
