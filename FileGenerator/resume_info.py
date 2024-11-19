@@ -202,7 +202,7 @@ class ResumeInfo:
         for att in self.all_att_in_skills:
             empty_template.append([att, 1])
         # CHATGPT HERE
-        gpt_response = gpt_attribute.GPT_Attribute(empty_template, gpt_model)
+        gpt_response = gpt_attribute.GPT_Attribute(empty_template, gpt_model, self.job_sum, self.job_resp, self.job_req)
         result = gpt_response.gpt_modded_list
         # Add mandatory_inclusion
         result.append(["MANDATORY_INCLUDE", 100000])
@@ -258,7 +258,14 @@ class ResumeInfo:
             result[point[0]].append(point[1])
         return result
 
-    def __init__(self, folder_name: str, gpt_model: str) -> None:
+    def __init__(
+        self,
+        folder_name: str,
+        gpt_model: str,
+        job_sum: str,
+        job_resp: str,
+        job_req: str,
+    ) -> None:
         """
         Defining the ResumeInfo
         Grab information from file
@@ -284,6 +291,9 @@ class ResumeInfo:
         # Reads file
         ################################################################
         # Parse
+        self.job_sum = job_sum
+        self.job_resp = job_resp
+        self.job_req = job_req
         self.height_list = []
         self.file_parser = file_parse.FileAccMod()
         self.all_info_list = self.file_parser.get_all(self.section_filenames, folder_name)
@@ -298,7 +308,7 @@ class ResumeInfo:
                                             "PROJECT",
                                             self.all_info_list[4])
         self.heading_info = self.parse_heading(self.all_info_list[0])
-        
+
         # Deal with file
         self.existing_height = (
                         self.get_header_height(self.heading_info)
