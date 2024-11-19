@@ -70,7 +70,7 @@ class ResumeBuilder:
         '''
         # Make the file path
         downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
-        pdf_path = os.path.join(downloads_folder, pdf_name)
+        pdf_path = os.path.join(downloads_folder, self.pdf_name)
         # Prepare a canvas object
         c = canvas.Canvas(pdf_path, pagesize=A4)
         c.setLineWidth(0.3)
@@ -120,18 +120,22 @@ class ResumeBuilder:
         target_pdf_name: str,
         overall_side_margin: int,
         info_folder: str,
+        job_sum:str, 
+        job_resp:str, 
+        job_req:str,
+        all_job_info:str = "",
         gpt_model: str = "gpt-4o-mini",
     ) -> None:
         self.pdf_name = target_pdf_name
         self.side_margin = overall_side_margin
-        self.resume_informations = resume_info.ResumeInfo(info_folder, gpt_model)
+        self.resume_informations = resume_info.ResumeInfo(info_folder, gpt_model, job_sum, job_resp, job_req, all_job_info)
         self.all_fonts = fonts.AllFonts()
 
 
 # Parameters:
 #######################################
-pdf_name = "BobSmithResume1.pdf"
-side_margin = 25
-r = ResumeBuilder(pdf_name, side_margin, "Accurate")
-r.build()
+# pdf_name = "BobSmithResume1.pdf"
+# side_margin = 25
+# r = ResumeBuilder(pdf_name, side_margin, "Accurate")
+# r.build()
 #######################################

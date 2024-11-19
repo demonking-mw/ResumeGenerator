@@ -43,3 +43,4 @@ STAGE3+:
 
 
 
+.\venv\Scripts\Activate.ps1
