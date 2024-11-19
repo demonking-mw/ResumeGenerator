@@ -120,14 +120,15 @@ class ResumeBuilder:
         target_pdf_name: str,
         overall_side_margin: int,
         info_folder: str,
-        job_sum: str, 
+        job_sum:str, 
         job_resp:str, 
         job_req:str,
+        all_job_info:str = "",
         gpt_model: str = "gpt-4o-mini",
     ) -> None:
         self.pdf_name = target_pdf_name
         self.side_margin = overall_side_margin
-        self.resume_informations = resume_info.ResumeInfo(info_folder, gpt_model, job_sum, job_resp, job_req)
+        self.resume_informations = resume_info.ResumeInfo(info_folder, gpt_model, job_sum, job_resp, job_req, all_job_info)
         self.all_fonts = fonts.AllFonts()
 
 

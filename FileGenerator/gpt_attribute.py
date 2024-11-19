@@ -38,12 +38,16 @@ class GPT_Attribute:
         Can potentially be modded to implement web scraping
         """
         result = ""
-        result += "JOB SUMMARY: "
-        result += self.job_sum + "\n"
-        result += "JOB RESPONSIBILITIES: "
-        result += self.job_resp + "\n"
-        result += "REQUIRED SKILL: "
-        result += self.job_req + "\n"
+        if(self.all_job_info == ""):
+            result += "JOB SUMMARY: "
+            result += self.job_sum + "\n"
+            result += "JOB RESPONSIBILITIES: "
+            result += self.job_resp + "\n"
+            result += "REQUIRED SKILL: "
+            result += self.job_req + "\n"
+        else:
+            result = self.all_job_info
+       
         return result
 
     def get_init_prompt(self) -> list:
@@ -87,11 +91,12 @@ class GPT_Attribute:
             result.append([item[0], value])
         return result
 
-    def __init__(self, att_list: list[list], model_name: str, job_sum: str, job_resp:str, job_req:str) -> None:
+    def __init__(self, att_list: list[list], model_name: str, job_sum: str, job_resp:str, job_req:str, all_job_info:str = "") -> None:
         self.att_list = att_list
         self.job_sum = job_sum
         self.job_resp = job_resp
         self.job_req = job_req
+        self.all_job_info = all_job_info
         self.opening_line = "Analyze the following job description, give each trait/skill in the list below a value between 0 to 9, inclusive. The value reflects how much the skill helps in getting the job, and how much the recruiter would value the skill. You should also consider how relevant the skill is to the job, as skills in proximity to what the recruiter desires should be awarded with some value."
         self.answer_style_guide = "your response must cover each trait in the format of:"
         self.first_response_dic = self.get_gpt_out(self.get_init_prompt(), model_name)

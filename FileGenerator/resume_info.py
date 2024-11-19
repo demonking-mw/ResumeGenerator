@@ -202,7 +202,7 @@ class ResumeInfo:
         for att in self.all_att_in_skills:
             empty_template.append([att, 1])
         # CHATGPT HERE
-        gpt_response = gpt_attribute.GPT_Attribute(empty_template, gpt_model, self.job_sum, self.job_resp, self.job_req)
+        gpt_response = gpt_attribute.GPT_Attribute(empty_template, gpt_model, self.job_sum, self.job_resp, self.job_req, self.all_job_info)
         result = gpt_response.gpt_modded_list
         # Add mandatory_inclusion
         result.append(["MANDATORY_INCLUDE", 100000])
@@ -265,6 +265,7 @@ class ResumeInfo:
         job_sum: str,
         job_resp: str,
         job_req: str,
+        all_job_info: str = ""
     ) -> None:
         """
         Defining the ResumeInfo
@@ -294,6 +295,7 @@ class ResumeInfo:
         self.job_sum = job_sum
         self.job_resp = job_resp
         self.job_req = job_req
+        self.all_job_info = all_job_info
         self.height_list = []
         self.file_parser = file_parse.FileAccMod()
         self.all_info_list = self.file_parser.get_all(self.section_filenames, folder_name)
