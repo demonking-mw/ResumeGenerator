@@ -13,6 +13,7 @@ import sys
 from ...FileGenerator import resume_pdf_builder
 
 from . import generate
+from . import view_info
 
 
 class MainWindow(QMainWindow):
@@ -37,7 +38,7 @@ class MainWindow(QMainWindow):
 
         # Add pages to the stack
         self.stack.addWidget(generate.Generate())
-        self.stack.addWidget(self.page2)
+        self.stack.addWidget(view_info.ViewInfo())
 
         # Page selection button
         button_cont = QWidget(self)

@@ -14,7 +14,7 @@ class FileAccMod:
         self.main_fp = dominant_fp
         self.encoding = encoding
 
-    def style_disp_item_ss(self, raw_list: list) -> list:
+    def style_disp_item_ss(self, raw_list: list, brief: bool = False) -> list:
         '''
         Style an item for display
         Ideally, each item in the list occupies a line
@@ -35,8 +35,11 @@ class FileAccMod:
                 time_info = item
                 continue
             information_list.append(item)
+        
         result_list = []
         result_list.append(title_info + "   ---   " + time_info) 
+        if brief:
+            return result_list
         for info in information_list:
             result_list.append(info)
         result_list.append("Traits:")
