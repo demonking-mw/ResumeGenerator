@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, 
                              QWidget, QComboBox, QLineEdit, 
-                             QPushButton, QStackedWidget)
+                             QPushButton, QStackedWidget, QTextEdit)
 import os
 from ...FileGenerator import resume_pdf_builder
 
@@ -55,7 +55,7 @@ class Generate(QWidget):
 
         self.desc_sec = QVBoxLayout()
         self.desc_header = QLabel("Enter Job Description")
-        self.desc_input = QLineEdit()
+        self.desc_input = QTextEdit()
         self.desc_input.setPlaceholderText("Developing grass allergy relief pills ...")
         self.desc_sec.addWidget(self.desc_header)
         self.desc_sec.addWidget(self.desc_input)
@@ -63,7 +63,7 @@ class Generate(QWidget):
 
         self.resp_sec = QVBoxLayout()
         self.resp_header = QLabel("Enter Job Responsibility")
-        self.resp_input = QLineEdit()
+        self.resp_input = QTextEdit()
         self.resp_input.setPlaceholderText("Touch grass on a daily basis ...")
         self.resp_sec.addWidget(self.resp_header)
         self.resp_sec.addWidget(self.resp_input)
@@ -71,7 +71,7 @@ class Generate(QWidget):
 
         self.req_sec = QVBoxLayout()
         self.req_header = QLabel("Enter Job Requirement")
-        self.req_input = QLineEdit()
+        self.req_input = QTextEdit()
         self.req_input.setPlaceholderText("Have grass allergy ...")
         self.req_sec.addWidget(self.req_header)
         self.req_sec.addWidget(self.req_input)
@@ -82,7 +82,7 @@ class Generate(QWidget):
 
         self.paste_sec = QVBoxLayout()
         self.paste_header = QLabel("Paste 'em all here")
-        self.paste_input = QLineEdit()
+        self.paste_input = QTextEdit()
         self.paste_input.setPlaceholderText("Grass is green, touch it ...")
         self.paste_sec.addWidget(self.paste_header)
         self.paste_sec.addWidget(self.paste_input)
@@ -127,6 +127,7 @@ class Generate(QWidget):
 
         self.conf_button = QPushButton("CONFIRM AND GENERATE")
         self.gen_status = QLabel("")
+        self.gen_status.setWordWrap(True)
         self.conf_button.clicked.connect(self.on_confirm)
 
         self.layout.addWidget(self.stack)
@@ -155,13 +156,19 @@ class Generate(QWidget):
 
     def switch_page(self, index):
         self.stack.setCurrentIndex(index)
+        if index == 0:
+            self.paste_input.clear()
+        else:
+            self.desc_input.clear()
+            self.resp_input.clear()
+            self.req_input.clear()
 
     def on_confirm(self):
-        resp = self.resp_input.text()
-        req = self.req_input.text()
-        desc = self.desc_input.text()
+        resp = self.resp_input.toPlainText()
+        req = self.req_input.toPlainText()
+        desc = self.desc_input.toPlainText()
         f_name = self.f_input.text()
-        paste_info = self.paste_input.text()
+        paste_info = self.paste_input.toPlainText()
         if self.folder_sel != "":
             if resp != "" and req != "" and desc != "":
                 self.gen_status.setText("Build commenced")
@@ -173,8 +180,12 @@ class Generate(QWidget):
                     r.build()
                     self.gen_status.setText("Build success, resume downloaded")
                     self.conf_button.setEnabled(True)
+                    self.desc_input.clear()
+                    self.resp_input.clear()
+                    self.req_input.clear()
                 except Exception as error:
-                    self.gen_status.setText(error)
+                    self.gen_status.setText(str(error))
+                    self.conf_button.setEnabled(True)
             elif paste_info != "":
                 self.gen_status.setText("Build commenced")
                 try:
@@ -194,8 +205,10 @@ class Generate(QWidget):
                     r.build()
                     self.gen_status.setText("Build success, resume downloaded")
                     self.conf_button.setEnabled(True)
+                    self.paste_input.clear()
                 except Exception as error:
-                    self.gen_status.setText(error)
+                    self.gen_status.setText(str(error))
+                    self.conf_button.setEnabled(True)
             else:
                 self.gen_status.setText("Missing Info!!")
         else:

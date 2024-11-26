@@ -14,6 +14,57 @@ class FileAccMod:
         self.main_fp = dominant_fp
         self.encoding = encoding
 
+    def change_header(self, folder_name: str, person_name: str="", head_desc: str="") -> str:
+        '''
+        changes the header. Filename is not requried since it just changes header
+        the return is the status: success or error
+        '''
+        try:
+            curr_file = self.read_file("HEADING.csv", folder_name)
+            print(curr_file)
+            if curr_file[0][0] != "HEADING":
+                return "Wrong file: header is instead " + curr_file[0][1]
+            new_row = []
+            if person_name != "":
+                new_row.append(person_name)
+            else:
+                new_row.append(curr_file[1][0])
+            if head_desc != "":
+                new_row.append(head_desc)
+            else:
+                new_row.append(curr_file[1][1])
+            if len(curr_file) == 1:
+                new_row.append(str(20))
+                curr_file.append(new_row)
+            else:
+                new_row.append(curr_file[1][2])
+                curr_file[1] = new_row
+            fn = self.main_fp + folder_name + "/" + "HEADING.csv"
+            abs_file_path = os.path.abspath(fn)
+            with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+                writer = csv.writer(file)
+                writer.writerows(curr_file)
+            return "completed!"
+        except Exception as error:
+            return str(error)
+
+    def print_folder(self, folder_name, file_name):
+        '''
+        returns
+        '''
+        curr = self.read_file(file_name, folder_name)
+        result = ""
+        nx = "\n"
+        bk = "\n\n"
+        result += curr[0][0]+bk
+        for i in range(1, len(curr)):
+            formatted = self.style_disp_item_ss(curr[i])
+            for item in formatted:
+                result += item+nx
+            result += bk
+        return result
+        
+
     def style_disp_item_ss(self, raw_list: list, brief: bool = False) -> list:
         '''
         Style an item for display
@@ -26,7 +77,7 @@ class FileAccMod:
         for item in raw_list:
             splitted = item.split()
             if len(splitted) > 0 and splitted[0] == "/=-z+f]j":
-                traits_list.append({splitted[1], splitted[2]})
+                traits_list.append([splitted[1], splitted[2]])
                 continue
             if title_info == "":
                 title_info = item
@@ -218,3 +269,4 @@ class FileAccMod:
         with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
             writer = csv.writer(file)
             writer.writerows(content)
+

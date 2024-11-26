@@ -7,10 +7,13 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QPushButton,
     QStackedWidget,
-    QGridLayout
+    QGridLayout,
+    QTextEdit
 )
+from PyQt6.QtCore import Qt
+
 import os
-from ...FileGenerator import resume_pdf_builder
+from ...FileGenerator import file_parse
 
 
 class ViewInfo(QWidget):
@@ -35,22 +38,40 @@ class ViewInfo(QWidget):
         self.selector_widget = QWidget()
         self.selector_widget.setFixedHeight(150)
         self.selector = QVBoxLayout()
-
-        self.mod_button = QPushButton()
+        # File add/remove button
+        self.mod_button = QPushButton("Add/Remove File and Folders")
         self.mod_button.clicked.connect(self.ModFile)
         self.selector.addWidget(self.mod_button)
-
+        # Info selector dropdowns
         self.info_selector_widget = QWidget()
         self.info_selector_widget.setFixedSize(300, 80)
         self.info_selector = self.InfoSelector()
         self.info_selector_widget.setLayout(self.info_selector)
         self.selector.addWidget(self.info_selector_widget)
-
+        # Target file path: only display upon selected
         self.target_file_path_label = QLabel()
         self.selector.addWidget(self.target_file_path_label)
         self.selector_widget.setLayout(self.selector)
 
+        # Displayer: shows everything in the file
+        self.info_display_widget = QWidget()
+        self.info_display = QVBoxLayout()
+        # Heading
+        self.info_display_heading = QLabel("Section Selected:")
+        self.info_display.addWidget(self.info_display_heading)
+        # File display in text
+        self.file_as_text = QTextEdit()
+        self.file_as_text.setReadOnly(True)
+        self.info_display.addWidget(self.file_as_text)
+        # Button to modify
+        self.modify_button = QPushButton("Modify Selected:")
+        self.modify_button.clicked.connect(self.EditSelected)
+        self.info_display.addWidget(self.modify_button)
+        self.info_display_widget.setLayout(self.info_display)
+
         self.layout.addWidget(self.selector_widget)
+        self.layout.addWidget(self.info_display_widget)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.setLayout(self.layout)
 
@@ -136,9 +157,21 @@ class ViewInfo(QWidget):
 
     def FileSelected(self, index):
         '''
-        not yet implemented
+        not yet fully implemented
+        called when both the file and folder is selected by the user
         '''
         if index != 0:
             self.target_file = self.target_file_list[index-1]
             self.target_file_path = "ResumeGenerator/Informations/" + self.target_folder + "/" +  self.target_file
             self.target_file_path_label.setText(self.target_file_path)
+            try:
+                fp = file_parse.FileAccMod()
+                self.file_as_text.setPlainText(fp.print_folder(self.target_folder, self.target_file))
+            except Exception as error:
+                self.file_as_text.setPlainText(str(error))
+
+    def EditSelected(self):
+        '''
+        To be implemented
+        Redirects to the modify page and carries forward information
+        '''
