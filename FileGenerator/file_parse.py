@@ -14,6 +14,132 @@ class FileAccMod:
         self.main_fp = dominant_fp
         self.encoding = encoding
 
+    def change_header(self, folder_name: str, person_name: str="", head_desc: str="") -> str:
+        '''
+        changes the header. Filename is not requried since it just changes header
+        the return is the status: success or error
+        '''
+        try:
+            curr_file = self.read_file("HEADING.csv", folder_name)
+            print(curr_file)
+            if curr_file[0][0] != "HEADING":
+                return "Wrong file: header is instead " + curr_file[0][1]
+            new_row = []
+            if person_name != "":
+                new_row.append(person_name)
+            else:
+                new_row.append(curr_file[1][0])
+            if head_desc != "":
+                new_row.append(head_desc)
+            else:
+                new_row.append(curr_file[1][1])
+            if len(curr_file) == 1:
+                new_row.append(str(20))
+                curr_file.append(new_row)
+            else:
+                new_row.append(curr_file[1][2])
+                curr_file[1] = new_row
+            fn = self.main_fp + folder_name + "/" + "HEADING.csv"
+            abs_file_path = os.path.abspath(fn)
+            with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+                writer = csv.writer(file)
+                writer.writerows(curr_file)
+            return "completed!"
+        except Exception as error:
+            return str(error)
+
+    def print_folder(self, folder_name, file_name):
+        '''
+        returns
+        '''
+        curr = self.read_file(file_name, folder_name)
+        result = ""
+        nx = "\n"
+        bk = "\n\n"
+        result += curr[0][0]+bk
+        for i in range(1, len(curr)):
+            formatted = self.style_disp_item_ss(curr[i])
+            for item in formatted:
+                result += item+nx
+            result += bk
+        return result
+        
+
+    def style_disp_item_ss(self, raw_list: list, brief: bool = False) -> list:
+        '''
+        Style an item for display
+        Ideally, each item in the list occupies a line
+        '''
+        title_info = ""
+        time_info = ""
+        information_list = []
+        traits_list = []
+        for item in raw_list:
+            splitted = item.split()
+            if len(splitted) > 0 and splitted[0] == "/=-z+f]j":
+                traits_list.append([splitted[1], splitted[2]])
+                continue
+            if title_info == "":
+                title_info = item
+                continue
+            if time_info == "":
+                time_info = item
+                continue
+            information_list.append(item)
+        
+        result_list = []
+        result_list.append(title_info + "   ---   " + time_info) 
+        if brief:
+            return result_list
+        for info in information_list:
+            result_list.append(info)
+        result_list.append("Traits:")
+        for info in traits_list:
+            result_list.append(str(info[0]) + "   ->   " + str(info[1]))
+        return result_list
+
+    def del_by_header_ss(self, folder_name: str, file_name: str, target_header: str) -> tuple[list, bool]:
+        '''
+        Delete an item in the file and return its information 
+        '''
+        content = self.read_file(file_name, folder_name)
+        row = 1
+        target_row_header = None
+        target_row_index = []
+        while row < len(content):
+            # loop through each row of the resume
+            col = 0
+            for item in content[row]:
+                splitted = item.split()
+                if len(splitted) > 0 and splitted[0] == "/=-z+f]j":
+                    col += 1
+                else:
+                    break
+            if target_header in content[row][col]:
+                target_row_index.append(row)
+                target_row_header = content[row][col]
+            row += 1
+        deleted_result = []
+        success = False
+        if len(target_row_index) == 0:
+            # FRONTEND: do something here since target is not found
+            print(target_header + " NOT FOUND IN FILE " + file_name)
+            deleted_result = ["Not Found"]
+        elif len(target_row_index) == 1:
+            # FRONTEND: found row
+            deleted_result = content[target_row_index[0]]
+            content.pop(target_row_index[0])
+            success = True
+        else:
+            # FRONTEND: multiple items found, alert user
+            print("MULTIPLE ITEMS FOUND ON REPLACE ATTEMPT, REPLACE CANCELLED")
+            deleted_result = ["Multiple Found"]
+        fn = self.main_fp + folder_name + "/" + file_name
+        abs_file_path = os.path.abspath(fn)
+        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+            writer = csv.writer(file)
+            writer.writerows(content)
+
     def mod_by_header_ss(self,
         attribute_list: list[list],
         folder_name: str,
@@ -143,3 +269,4 @@ class FileAccMod:
         with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
             writer = csv.writer(file)
             writer.writerows(content)
+

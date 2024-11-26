@@ -13,14 +13,14 @@ Adding items to sections are implemented in file_parse. sample code is commented
 
 STAGE2:
 - Implement frontend to make usage easy:
-    - init page where user enters their own openai api key
+    - init page where user enters their own openai api key -Optional
     - modification page to make editing resume information easy
-    - generator page for easy use
+    - generator page for easy use -V
     - publish for free use as an app
 - Improve backend:
-    - write edit and remove function for items
-    - write a display function that gives out all useful informations in a neat format
-    - write function to edit specific attribute for some item
+    - write edit and remove function for items -V
+    - write a display function that gives out all useful informations in a neat format -V
+    - write function to edit specific attribute for some item -V
     - write cross compare function that compares the same attribute across different items
 
 STAGE3+:

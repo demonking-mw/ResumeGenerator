@@ -13,6 +13,7 @@ import sys
 from ...FileGenerator import resume_pdf_builder
 
 from . import generate
+from . import view_info
 
 
 class MainWindow(QMainWindow):
@@ -20,7 +21,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Grass Allergy Relief")
-        self.setGeometry(100, 100, 500, 500)
+        self.setGeometry(100, 50, 500, 550)
 
         # Create the central widget
         self.central_widget = QWidget()
@@ -37,17 +38,20 @@ class MainWindow(QMainWindow):
 
         # Add pages to the stack
         self.stack.addWidget(generate.Generate())
-        self.stack.addWidget(self.page2)
+        self.stack.addWidget(view_info.ViewInfo())
 
         # Page selection button
         button_cont = QWidget(self)
-        button_cont.setStyleSheet("""
+        button_cont.setStyleSheet(
+            """
             QWidget {
                 border: 1px solid black; /* Border around the widget */
-                background-color: lightgray; /* Background color */
+                background-color: darkgray; /* Background color */
                 border-radius: 5px; /* Optional: rounded corners */
+                padding: 15px; /* Padding inside the button */
             }
-        """)
+        """
+        )
         button_layout = QHBoxLayout()
         buttons = [
             ("Generate Resume", 0),
@@ -58,12 +62,12 @@ class MainWindow(QMainWindow):
             button.setStyleSheet(
                 """
             QPushButton {
-                background-color: white; /* Background color */
+                background-color: darkgray; /* Background color */
                 border: 2px solid black; /* Border style */
                 border-radius: 5px; /* Rounded corners */
                 color: black; /* Text color */
                 font-size: 12px; /* Font size */
-                padding: 5px; /* Padding inside the button */
+                padding: 2px; /* Padding inside the button */
             }
             QPushButton:hover {
                 background-color: skyblue; /* Background color on hover */
