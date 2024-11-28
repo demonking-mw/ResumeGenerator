@@ -1,24 +1,32 @@
-'''
+"""
 Parse files. 
 file modification functions also implemented here
-'''
+"""
+
 import os
 import csv
+
 
 class FileAccMod:
     """
     File read and modify
     """
-    def __init__(self, dominant_fp: str = 'ResumeGenerator/Informations/',
-                 encoding: str = "utf-8") -> None:
+
+    def __init__(
+        self,
+        dominant_fp: str = "ResumeGenerator/Informations/",
+        encoding: str = "utf-8",
+    ) -> None:
         self.main_fp = dominant_fp
         self.encoding = encoding
 
-    def change_header(self, folder_name: str, person_name: str="", head_desc: str="") -> str:
-        '''
+    def change_header(
+        self, folder_name: str, person_name: str = "", head_desc: str = ""
+    ) -> str:
+        """
         changes the header. Filename is not requried since it just changes header
         the return is the status: success or error
-        '''
+        """
         try:
             curr_file = self.read_file("HEADING.csv", folder_name)
             print(curr_file)
@@ -41,35 +49,36 @@ class FileAccMod:
                 curr_file[1] = new_row
             fn = self.main_fp + folder_name + "/" + "HEADING.csv"
             abs_file_path = os.path.abspath(fn)
-            with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+            with open(
+                abs_file_path, mode="w", newline="", encoding=self.encoding
+            ) as file:
                 writer = csv.writer(file)
                 writer.writerows(curr_file)
             return "completed!"
         except Exception as error:
             return str(error)
 
-    def print_folder(self, folder_name, file_name):
-        '''
+    def print_folder(self, folder_name, file_name, simplified=False):
+        """
         returns
-        '''
+        """
         curr = self.read_file(file_name, folder_name)
         result = ""
         nx = "\n"
         bk = "\n\n"
-        result += curr[0][0]+bk
+        result += curr[0][0] + bk
         for i in range(1, len(curr)):
-            formatted = self.style_disp_item_ss(curr[i])
+            formatted = self.style_disp_item_ss(curr[i], simplified)
             for item in formatted:
-                result += item+nx
+                result += item + nx
             result += bk
         return result
-        
 
     def style_disp_item_ss(self, raw_list: list, brief: bool = False) -> list:
-        '''
+        """
         Style an item for display
         Ideally, each item in the list occupies a line
-        '''
+        """
         title_info = ""
         time_info = ""
         information_list = []
@@ -86,9 +95,9 @@ class FileAccMod:
                 time_info = item
                 continue
             information_list.append(item)
-        
+
         result_list = []
-        result_list.append(title_info + "   ---   " + time_info) 
+        result_list.append(title_info + "   ---   " + time_info)
         if brief:
             return result_list
         for info in information_list:
@@ -98,10 +107,12 @@ class FileAccMod:
             result_list.append(str(info[0]) + "   ->   " + str(info[1]))
         return result_list
 
-    def del_by_header_ss(self, folder_name: str, file_name: str, target_header: str) -> tuple[list, bool]:
-        '''
-        Delete an item in the file and return its information 
-        '''
+    def del_by_header_ss(
+        self, folder_name: str, file_name: str, target_header: str
+    ) -> tuple[list, bool]:
+        """
+        Delete an item in the file and return its information
+        """
         content = self.read_file(file_name, folder_name)
         row = 1
         target_row_header = None
@@ -140,16 +151,18 @@ class FileAccMod:
             writer = csv.writer(file)
             writer.writerows(content)
 
-    def mod_by_header_ss(self,
+    def mod_by_header_ss(
+        self,
         attribute_list: list[list],
         folder_name: str,
         file_name: str,
         target_header: str,
         time: str,
-        descriptions: list) -> None:
-        '''
+        descriptions: list,
+    ) -> None:
+        """
         Modify an item in the file by searching for its header
-        '''
+        """
         content = self.read_file(file_name, folder_name)
         row = 1
         target_row_header = None
@@ -160,13 +173,13 @@ class FileAccMod:
             for item in content[row]:
                 splitted = item.split()
                 if len(splitted) > 0 and splitted[0] == "/=-z+f]j":
-                    col+=1
+                    col += 1
                 else:
                     break
             if target_header in content[row][col]:
                 target_row_index.append(row)
                 target_row_header = content[row][col]
-            row+=1
+            row += 1
         if len(target_row_index) == 0:
             # FRONTEND: do something here since target is not found
             print(target_header + " NOT FOUND IN FILE " + file_name)
@@ -192,21 +205,27 @@ class FileAccMod:
             writer.writerows(content)
 
     def construct_folder(
-        self, section_filenames: list, section_folder_name: str,
-        heading_top: int = 15, skills_top = 20, force_const: bool = False
+        self,
+        section_filenames: list,
+        section_folder_name: str,
+        heading_top: int = 15,
+        skills_top=20,
+        force_const: bool = False,
     ) -> int:
-        '''
+        """
         If the files exists, do nothing unless force_const is set to true
         returns the number of file added
-        '''
+        """
         counter = 0
         for sect in section_filenames:
             sec = sect[:-4]
-            fn = self.main_fp + section_folder_name + '/' + sect
+            fn = self.main_fp + section_folder_name + "/" + sect
             abs_file_path = os.path.abspath(fn)
             if (not os.path.isfile(abs_file_path)) or force_const:
                 counter += 1
-                with open(abs_file_path, mode='w', newline='', encoding=self.encoding) as file:
+                with open(
+                    abs_file_path, mode="w", newline="", encoding=self.encoding
+                ) as file:
                     writer = csv.writer(file)
                     if sec == "HEADING":
                         writer.writerow(["HEADING", heading_top])
@@ -246,11 +265,11 @@ class FileAccMod:
         descriptions: list,
         location: int = 0,
     ):
-        '''
+        """
         add a line to a standard section. note: each item in attribute_list is a [str, int]
         location describes where the item is put relative to other ones
         enter an arbitrarily large number for location for the item to be placed last (say, 1000000)
-        '''
+        """
         content = self.read_file(file_name, folder_name)
         new_att = []
         for att in attribute_list:
@@ -260,13 +279,12 @@ class FileAccMod:
         new_att.append(time)
         for desc in descriptions:
             new_att.append(desc)
-        if location+1 > len(content):
-            location = len(content)-1
-        content.insert(location+1, new_att)
+        if location + 1 > len(content):
+            location = len(content) - 1
+        content.insert(location + 1, new_att)
 
-        fn = self.main_fp + folder_name + '/' + file_name
+        fn = self.main_fp + folder_name + "/" + file_name
         abs_file_path = os.path.abspath(fn)
         with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
             writer = csv.writer(file)
             writer.writerows(content)
-

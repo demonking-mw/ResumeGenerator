@@ -25,10 +25,11 @@ class AuxSectionsInfo:
     """
     Dataclass for both the header and the skills section.
     """
+
     top_space: int  # Header Only
     title: str  # Header Only
     header_basic_info: str  # Header Only
-    skills_list: list   # Skills Only
+    skills_list: list  # Skills Only
     height_buffer: int  # Both
     trait_subtrait_list: list
 
@@ -57,7 +58,7 @@ class ResumeInfo:
         """
         result = 0
         result += self.custom_fonts.section_title.leading
-        vert = math.ceil(len(skills_data_class.skills_list)/2)
+        vert = math.ceil(len(skills_data_class.skills_list) / 2)
         result += vert * self.custom_fonts.point_right.leading
         result += skills_data_class.height_buffer
         return result
@@ -78,11 +79,12 @@ class ResumeInfo:
             header_basic_info=info_list[1][1],
             skills_list=[],
             height_buffer=int(info_list[1][2]),
-            trait_subtrait_list=[]
+            trait_subtrait_list=[],
         )
 
-    def parse_skills(self, info_list: list[list],
-                     selection_list=None) -> AuxSectionsInfo:
+    def parse_skills(
+        self, info_list: list[list], selection_list=None
+    ) -> AuxSectionsInfo:
         """
         Returns info about the skills section
         Skills file format:
@@ -96,7 +98,7 @@ class ResumeInfo:
             print("ERROR: SKILLS FILE MISMATCH")
             return None
 
-        selection = range(len(info_list)-1)
+        selection = range(len(info_list) - 1)
         if selection_list:
             selection = selection_list
         selected_info = []
@@ -104,11 +106,11 @@ class ResumeInfo:
         for i in selection:
             ts_sub1 = []
             ts_sub2 = []
-            ts_sub1.append(info_list[i+1][0])
-            with_dot = "• " + info_list[i+1][0]
+            ts_sub1.append(info_list[i + 1][0])
+            with_dot = "• " + info_list[i + 1][0]
             selected_info.append(with_dot)
-            for k in range(len(info_list[i+1])-1):
-                ts_sub2.append(info_list[i+1][k+1])
+            for k in range(len(info_list[i + 1]) - 1):
+                ts_sub2.append(info_list[i + 1][k + 1])
             ts_sub1.append(ts_sub2)
             ts_list.append(ts_sub1)
         return AuxSectionsInfo(
@@ -117,12 +119,12 @@ class ResumeInfo:
             header_basic_info="",
             skills_list=selected_info,
             height_buffer=int(info_list[0][1]),
-            trait_subtrait_list=ts_list
+            trait_subtrait_list=ts_list,
         )
 
     def parse_standard(
-            self, target_type: str, info_list: list[list]
-            ) -> standard_section.StandardSection:
+        self, target_type: str, info_list: list[list]
+    ) -> standard_section.StandardSection:
         """
         Parse a standard section, can be education, experience, or porjects
         File format:
@@ -134,7 +136,7 @@ class ResumeInfo:
         if not info_list[0][0] == target_type:
             print("ERROR: " + target_type + " FILE MISMATCH")
             return None
-        selection = list(range(len(info_list)-1))
+        selection = list(range(len(info_list) - 1))
         if info_list[0][1] == "BP":
             is_bp = True
         else:
@@ -142,14 +144,14 @@ class ResumeInfo:
 
         selected_info = []
         for i in selection:
-            selected_info.append(info_list[i+1])
+            selected_info.append(info_list[i + 1])
         return standard_section.StandardSection(
-            target_type,
-            selected_info,
-            bullet_point=is_bp)
+            target_type, selected_info, bullet_point=is_bp
+        )
 
-    def mod_standard(self, standard_sec: standard_section.StandardSection,
-                     selection_list: list) -> standard_section.StandardSection:
+    def mod_standard(
+        self, standard_sec: standard_section.StandardSection, selection_list: list
+    ) -> standard_section.StandardSection:
         """
         Modify a full standard_section by only keeping what's been selected
         """
@@ -160,22 +162,23 @@ class ResumeInfo:
         for i in selection_list:
             refined_list.append(full_info_list[i])
         return standard_section.StandardSection(
-            sec_title,
-            refined_list,
-            bullet_point=bull_point)
+            sec_title, refined_list, bullet_point=bull_point
+        )
 
-    def get_mega_list(self,
-                      sec_info: list[standard_section.StandardSection]
-                      ) -> list:
-        '''
+    def get_mega_list(self, sec_info: list[standard_section.StandardSection]) -> list:
+        """
         Gets an overarching list containing everything abount the entir resume
-        '''
+        """
         result = []
         for i in range(len(sec_info)):
             sub = []
             for n in range(len(sec_info[i].attribute_weight_list)):
-                sub.append([sec_info[i].attribute_weight_list[n], 
-                            sec_info[i].sub_height_list[n]])
+                sub.append(
+                    [
+                        sec_info[i].attribute_weight_list[n],
+                        sec_info[i].sub_height_list[n],
+                    ]
+                )
             result.append(sub)
         return result
 
@@ -202,7 +205,14 @@ class ResumeInfo:
         for att in self.all_att_in_skills:
             empty_template.append([att, 1])
         # CHATGPT HERE
-        gpt_response = gpt_attribute.GPT_Attribute(empty_template, gpt_model, self.job_sum, self.job_resp, self.job_req, self.all_job_info)
+        gpt_response = gpt_attribute.GPT_Attribute(
+            empty_template,
+            gpt_model,
+            self.job_sum,
+            self.job_resp,
+            self.job_req,
+            self.all_job_info,
+        )
         result = gpt_response.gpt_modded_list
         # Add mandatory_inclusion
         result.append(["MANDATORY_INCLUDE", 100000])
@@ -219,7 +229,7 @@ class ResumeInfo:
             for req in self.desired_skillset:
                 if att[0] == req[0]:
                     result += att[1] * req[1]
-        return result+1
+        return result + 1
 
     def build_score_height_list(self) -> list[list]:
         """
@@ -248,13 +258,13 @@ class ResumeInfo:
         selected = [[] for _ in range(avail_height + 1)]
         for point in sc_height_list:
             for i in range(avail_height, int(point[3]) - 1, -1):
-                if DP[i-int(point[3])]+point[2] > DP[i]:
-                    DP[i] = DP[i-int(point[3])]+point[2]
-                    selected[i] = selected[i-int(point[3])]+[point]
+                if DP[i - int(point[3])] + point[2] > DP[i]:
+                    DP[i] = DP[i - int(point[3])] + point[2]
+                    selected[i] = selected[i - int(point[3])] + [point]
         # now unpack the selected array and return the right thing
 
         result = [[] for _ in range(len(self.sections_mega_list))]
-        for point in selected[avail_height-1]:
+        for point in selected[avail_height - 1]:
             result[point[0]].append(point[1])
         return result
 
@@ -265,7 +275,7 @@ class ResumeInfo:
         job_sum: str,
         job_resp: str,
         job_req: str,
-        all_job_info: str = ""
+        all_job_info: str = "",
     ) -> None:
         """
         Defining the ResumeInfo
@@ -280,13 +290,14 @@ class ResumeInfo:
         ##################################################################
 
         self.custom_fonts = fonts.AllFonts()
-        self.topic_list = ["HEADING", "SKILLS", "EDUCATION",
-                          "EXPERIENCE", "PROJECTS"]
-        self.section_filenames = ["HEADING.csv",
-                                  "SKILLS.csv",
-                                  "EDUCATION.csv",
-                                  "EXPERIENCE.csv",
-                                  "PROJECTS.csv"]
+        self.topic_list = ["HEADING", "SKILLS", "EDUCATION", "EXPERIENCE", "PROJECTS"]
+        self.section_filenames = [
+            "HEADING.csv",
+            "SKILLS.csv",
+            "EDUCATION.csv",
+            "EXPERIENCE.csv",
+            "PROJECTS.csv",
+        ]
         ################################################################
 
         # Reads file
@@ -298,43 +309,42 @@ class ResumeInfo:
         self.all_job_info = all_job_info
         self.height_list = []
         self.file_parser = file_parse.FileAccMod()
-        self.all_info_list = self.file_parser.get_all(self.section_filenames, folder_name)
+        self.all_info_list = self.file_parser.get_all(
+            self.section_filenames, folder_name
+        )
         self.skills_info = self.parse_skills(self.all_info_list[1])
-        self.all_edu_info = self.parse_standard(
-                                            "EDUCATION",
-                                            self.all_info_list[2])
-        self.all_exp_info = self.parse_standard(
-                                            "EXPERIENCE",
-                                            self.all_info_list[3])
-        self.all_proj_info = self.parse_standard(
-                                            "PROJECT",
-                                            self.all_info_list[4])
+        self.all_edu_info = self.parse_standard("EDUCATION", self.all_info_list[2])
+        self.all_exp_info = self.parse_standard("EXPERIENCE", self.all_info_list[3])
+        self.all_proj_info = self.parse_standard("PROJECT", self.all_info_list[4])
         self.heading_info = self.parse_heading(self.all_info_list[0])
 
         # Deal with file
         self.existing_height = (
-                        self.get_header_height(self.heading_info)
-                        + self.get_skills_height(self.skills_info)
-                        + self.all_edu_info.empty_height
-                        + self.all_exp_info.empty_height
-                        + self.all_proj_info.empty_height
-                        + 5
-                                )
+            self.get_header_height(self.heading_info)
+            + self.get_skills_height(self.skills_info)
+            + self.all_edu_info.empty_height
+            + self.all_exp_info.empty_height
+            + self.all_proj_info.empty_height
+            + 5
+        )
         self.skills_att_list = self.skills_info.trait_subtrait_list
-        self.sections_mega_list = self.get_mega_list([self.all_edu_info,
-                                                      self.all_exp_info,
-                                                      self.all_proj_info])
+        self.sections_mega_list = self.get_mega_list(
+            [self.all_edu_info, self.all_exp_info, self.all_proj_info]
+        )
         self.all_att_in_skills = self.get_all_skills_att()
         self.desired_skillset = self.get_desire(gpt_model)
         self.resume_selection_list = self.generate_resume_list()
 
         # Add
-        self.edu_info = self.mod_standard(self.all_edu_info,
-                                          self.resume_selection_list[0])
-        self.exp_info = self.mod_standard(self.all_exp_info,
-                                          self.resume_selection_list[1])
-        self.proj_info = self.mod_standard(self.all_proj_info,
-                                           self.resume_selection_list[2])
+        self.edu_info = self.mod_standard(
+            self.all_edu_info, self.resume_selection_list[0]
+        )
+        self.exp_info = self.mod_standard(
+            self.all_exp_info, self.resume_selection_list[1]
+        )
+        self.proj_info = self.mod_standard(
+            self.all_proj_info, self.resume_selection_list[2]
+        )
         self.height_list.append(self.get_header_height(self.heading_info))
         self.height_list.append(self.get_skills_height(self.skills_info))
         self.height_list.append(self.edu_info.total_height)

@@ -21,10 +21,10 @@ STAGE2:
     - write edit and remove function for items -V
     - write a display function that gives out all useful informations in a neat format -V
     - write function to edit specific attribute for some item -V
-    - write cross compare function that compares the same attribute across different items
 
 STAGE3+:
 - Implement more advanced frontend
+    - write cross compare function that compares the same attribute across different items
     - page for visually comparing attribute for different items
     - page to dynamically change attribute 
     - web version with database

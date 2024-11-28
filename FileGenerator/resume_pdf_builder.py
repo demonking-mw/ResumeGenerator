@@ -5,24 +5,32 @@ import os
 from . import resume_info
 from . import fonts
 
+
 class ResumeBuilder:
-    '''
+    """
     The class that builds the resume
-    Calling workflow: 
+    Calling workflow:
     b = ResumeBuilder(...)
     b.build()
-    '''
+    """
+
     def build_all_frames(self, frame_heights: list[int]) -> list:
-        '''
+        """
         Builds the lists required for making the resume from each data file
-        '''
+        """
         result = []
         total_height = -1
         for frame_h in frame_heights:
             total_height += frame_h
-            new_frame = Frame(-1, A4[1] - total_height, A4[0]+2,
-                            frame_h, leftPadding=self.side_margin+1,
-                            rightPadding=self.side_margin+1, showBoundary=True)
+            new_frame = Frame(
+                -1,
+                A4[1] - total_height,
+                A4[0] + 2,
+                frame_h,
+                leftPadding=self.side_margin + 1,
+                rightPadding=self.side_margin + 1,
+                showBoundary=True,
+            )
             result.append(new_frame)
         return result
 
@@ -65,9 +73,9 @@ class ResumeBuilder:
         return section_content
 
     def build(self) -> None:
-        '''
+        """
         builds the pdf
-        '''
+        """
         # Make the file path
         downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
         pdf_path = os.path.join(downloads_folder, self.pdf_name)
@@ -75,8 +83,7 @@ class ResumeBuilder:
         c = canvas.Canvas(pdf_path, pagesize=A4)
         c.setLineWidth(0.3)
 
-        frames = self.build_all_frames(
-            self.resume_informations.height_list)
+        frames = self.build_all_frames(self.resume_informations.height_list)
 
         all_contents = []
 
@@ -120,15 +127,17 @@ class ResumeBuilder:
         target_pdf_name: str,
         overall_side_margin: int,
         info_folder: str,
-        job_sum:str, 
-        job_resp:str, 
-        job_req:str,
-        all_job_info:str = "",
+        job_sum: str,
+        job_resp: str,
+        job_req: str,
+        all_job_info: str = "",
         gpt_model: str = "gpt-4o-mini",
     ) -> None:
         self.pdf_name = target_pdf_name
         self.side_margin = overall_side_margin
-        self.resume_informations = resume_info.ResumeInfo(info_folder, gpt_model, job_sum, job_resp, job_req, all_job_info)
+        self.resume_informations = resume_info.ResumeInfo(
+            info_folder, gpt_model, job_sum, job_resp, job_req, all_job_info
+        )
         self.all_fonts = fonts.AllFonts()
 
 

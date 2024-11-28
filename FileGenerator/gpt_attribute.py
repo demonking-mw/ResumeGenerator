@@ -4,12 +4,15 @@ returns a list with identical structure, but every weight should be changed
 TO GET THIS WORKING: follow the beginner guide on the gpt official website
 to get the key and store it in an env file, also put it in environment var.
 """
+
 from openai import OpenAI
+
 
 class GPT_Attribute:
     """
     set attribute list through gpt.
     """
+
     def get_gpt_out(self, input_message: list, gpt_model: str) -> str:
         """
         Gets the output from ChatGPT with a given input
@@ -17,8 +20,8 @@ class GPT_Attribute:
         print("COMMENCE GPT RETRIVAL ATTEMPT")
         client = OpenAI()
         completion = client.chat.completions.create(
-            model=gpt_model,
-            messages=input_message)
+            model=gpt_model, messages=input_message
+        )
         print("TOKEN_USED:")
         print(completion.usage.total_tokens)
         return completion.choices[0].message
@@ -27,10 +30,7 @@ class GPT_Attribute:
         """
         makes the dictionary that gets fed into get_gpt_out
         """
-        messages = [{
-            "role": "user",
-            "content": input_message
-        }]
+        messages = [{"role": "user", "content": input_message}]
         return messages
 
     def get_job_description(self):
@@ -38,7 +38,7 @@ class GPT_Attribute:
         Can potentially be modded to implement web scraping
         """
         result = ""
-        if(self.all_job_info == ""):
+        if self.all_job_info == "":
             result += "JOB SUMMARY: "
             result += self.job_sum + "\n"
             result += "JOB RESPONSIBILITIES: "
@@ -47,7 +47,7 @@ class GPT_Attribute:
             result += self.job_req + "\n"
         else:
             result = self.all_job_info
-       
+
         return result
 
     def get_init_prompt(self) -> list:
@@ -74,7 +74,7 @@ class GPT_Attribute:
         result = 1
         # Check if the target was found and if there is a character after it
         if index != -1 and index + len(target) < len(gpt_result):
-            character_after_target = gpt_result[index + len(target)+1]
+            character_after_target = gpt_result[index + len(target) + 1]
             result = int(character_after_target)
         else:
             print("ERROR")
@@ -91,14 +91,24 @@ class GPT_Attribute:
             result.append([item[0], value])
         return result
 
-    def __init__(self, att_list: list[list], model_name: str, job_sum: str, job_resp:str, job_req:str, all_job_info:str = "") -> None:
+    def __init__(
+        self,
+        att_list: list[list],
+        model_name: str,
+        job_sum: str,
+        job_resp: str,
+        job_req: str,
+        all_job_info: str = "",
+    ) -> None:
         self.att_list = att_list
         self.job_sum = job_sum
         self.job_resp = job_resp
         self.job_req = job_req
         self.all_job_info = all_job_info
         self.opening_line = "Analyze the following job description, give each trait/skill in the list below a value between 0 to 9, inclusive. The value reflects how much the skill helps in getting the job, and how much the recruiter would value the skill. You should also consider how relevant the skill is to the job, as skills in proximity to what the recruiter desires should be awarded with some value."
-        self.answer_style_guide = "your response must cover each trait in the format of:"
+        self.answer_style_guide = (
+            "your response must cover each trait in the format of:"
+        )
         self.first_response_dic = self.get_gpt_out(self.get_init_prompt(), model_name)
         print("GPT RESPONSE:")
         print(self.first_response_dic)

@@ -1,8 +1,17 @@
-from PyQt6.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, 
-                             QWidget, QComboBox, QLineEdit, 
-                             QPushButton, QStackedWidget, QTextEdit)
+from PyQt6.QtWidgets import (
+    QLabel,
+    QVBoxLayout,
+    QHBoxLayout,
+    QWidget,
+    QComboBox,
+    QLineEdit,
+    QPushButton,
+    QStackedWidget,
+    QTextEdit,
+)
 import os
 from ...FileGenerator import resume_pdf_builder
+
 
 class Generate(QWidget):
     def __init__(self):
@@ -150,7 +159,9 @@ class Generate(QWidget):
         rel_path = "ResumeGenerator/Informations/"
         abs_file_path = os.path.abspath(rel_path)
         folder_names = [
-            name for name in os.listdir(abs_file_path) if os.path.isdir(os.path.join(abs_file_path, name))
+            name
+            for name in os.listdir(abs_file_path)
+            if os.path.isdir(os.path.join(abs_file_path, name))
         ]
         return folder_names
 
@@ -176,7 +187,15 @@ class Generate(QWidget):
                     self.conf_button.setEnabled(False)
                     pdf_name = f_name + ".pdf"
                     side_margin = 25
-                    r = resume_pdf_builder.ResumeBuilder(pdf_name, side_margin, self.folder_sel, desc, resp, req, gpt_model=self.model_sel)
+                    r = resume_pdf_builder.ResumeBuilder(
+                        pdf_name,
+                        side_margin,
+                        self.folder_sel,
+                        desc,
+                        resp,
+                        req,
+                        gpt_model=self.model_sel,
+                    )
                     r.build()
                     self.gen_status.setText("Build success, resume downloaded")
                     self.conf_button.setEnabled(True)

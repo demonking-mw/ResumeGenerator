@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QStackedWidget,
     QGridLayout,
-    QTextEdit
+    QTextEdit,
 )
 from PyQt6.QtCore import Qt
 
@@ -28,6 +28,8 @@ class ViewInfo(QWidget):
         self.target_file_list = []
         self.target_file = ""
         self.target_file_path = ""
+        self.file_display_text = ""
+        self.file_display_simple = ""
 
         # Header
         self.header_label = QLabel("Information Viewer")
@@ -76,9 +78,9 @@ class ViewInfo(QWidget):
         self.setLayout(self.layout)
 
     def InfoSelector(self):
-        '''
+        """
         A grid layout that contains 3 dropdowns
-        '''
+        """
         layout = QGridLayout()
         layout.addWidget(QLabel("Select Folder"), 0, 0)
         layout.addWidget(QLabel("Select Section"), 0, 1)
@@ -110,9 +112,9 @@ class ViewInfo(QWidget):
         self.info_selector.addWidget(file_options, 1, 1)
 
     def folder_selected(self, index) -> None:
-        if(index != 0):
+        if index != 0:
 
-            selected_item = self.target_folder_list[index-1]
+            selected_item = self.target_folder_list[index - 1]
             self.target_folder = selected_item
             folder_path = "ResumeGenerator/Informations/" + selected_item
             self.target_file_list = self.GetFileList(folder_path)
@@ -124,10 +126,10 @@ class ViewInfo(QWidget):
                 if widget:
                     widget.deleteLater()
 
-    def GetSub(self, rel_path:str) -> list:
-        '''
+    def GetSub(self, rel_path: str) -> list:
+        """
         To use this, path starts from ResumeGenerator/...
-        '''
+        """
         abs_file_path = os.path.abspath(rel_path)
         folder_names = [
             name
@@ -141,7 +143,9 @@ class ViewInfo(QWidget):
         if not os.path.isabs(folder_path):
             raise ValueError("The provided path must be an absolute path.")
         if not os.path.isdir(folder_path):
-            raise FileNotFoundError(f"The path '{folder_path}' is not a valid directory.")
+            raise FileNotFoundError(
+                f"The path '{folder_path}' is not a valid directory."
+            )
 
         # List comprehension to filter out directories
         return [
@@ -151,27 +155,38 @@ class ViewInfo(QWidget):
         ]
 
     def ModFile(self):
-        '''
+        """
         Modify file structure, implement in stage 3
-        '''
+        """
 
     def FileSelected(self, index):
-        '''
+        """
         not yet fully implemented
         called when both the file and folder is selected by the user
-        '''
+        """
         if index != 0:
-            self.target_file = self.target_file_list[index-1]
-            self.target_file_path = "ResumeGenerator/Informations/" + self.target_folder + "/" +  self.target_file
+            self.target_file = self.target_file_list[index - 1]
+            self.target_file_path = (
+                "ResumeGenerator/Informations/"
+                + self.target_folder
+                + "/"
+                + self.target_file
+            )
             self.target_file_path_label.setText(self.target_file_path)
             try:
                 fp = file_parse.FileAccMod()
-                self.file_as_text.setPlainText(fp.print_folder(self.target_folder, self.target_file))
+                self.file_display_text = fp.print_folder(
+                    self.target_folder, self.target_file
+                )
+                self.file_display_simple = fp.print_folder(
+                    self.target_folder, self.target_file, True
+                )
+                self.file_as_text.setPlainText(self.file_display_text)
             except Exception as error:
                 self.file_as_text.setPlainText(str(error))
 
     def EditSelected(self):
-        '''
+        """
         To be implemented
         Redirects to the modify page and carries forward information
-        '''
+        """
