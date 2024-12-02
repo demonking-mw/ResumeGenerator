@@ -5,6 +5,7 @@ file modification functions also implemented here
 
 import os
 import csv
+import traceback
 
 
 class FileAccMod:
@@ -56,9 +57,24 @@ class FileAccMod:
                 writer.writerows(curr_file)
             return "completed!"
         except Exception as error:
-            return str(error)
+            return traceback.format_exc()
 
-    def print_folder(self, folder_name, file_name, simplified=False):
+    def print_folder_list(self, folder_name: str, file_name) -> list:
+        """
+        returns a list of formatted items
+        only the header and the time is displayed
+        heading is removed
+        """
+        curr = self.read_file(file_name, folder_name)
+        result = []
+        title_list = []
+        for i in range(1, len(curr)):
+            formatted, curr_title = self.style_disp_item_ss(curr[i], True)
+            result.append(formatted[0])
+            title_list.append(curr_title)
+        return result, title_list
+
+    def print_folder(self, folder_name, file_name, simplified=False) -> str:
         """
         returns
         """
@@ -67,10 +83,14 @@ class FileAccMod:
         nx = "\n"
         bk = "\n\n"
         result += curr[0][0] + bk
+        title_wasted = "" # catch the title output to avoid error
         for i in range(1, len(curr)):
-            formatted = self.style_disp_item_ss(curr[i], simplified)
-            for item in formatted:
-                result += item + nx
+            formatted, title_wasted = self.style_disp_item_ss(curr[i], simplified)
+            if simplified:
+                result += formatted[0]
+            else:
+                for item in formatted:
+                    result += item + nx
             result += bk
         return result
 
@@ -99,13 +119,13 @@ class FileAccMod:
         result_list = []
         result_list.append(title_info + "   ---   " + time_info)
         if brief:
-            return result_list
+            return result_list, title_info
         for info in information_list:
             result_list.append(info)
         result_list.append("Traits:")
         for info in traits_list:
             result_list.append(str(info[0]) + "   ->   " + str(info[1]))
-        return result_list
+        return result_list, title_info
 
     def del_by_header_ss(
         self, folder_name: str, file_name: str, target_header: str

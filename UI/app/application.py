@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Grass Allergy Relief")
-        self.setGeometry(100, 50, 500, 550)
+        self.setGeometry(100, 50, 500, 600)
 
         # Create the central widget
         self.central_widget = main_page.MainPage()

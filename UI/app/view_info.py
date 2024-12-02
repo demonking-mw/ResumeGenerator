@@ -1,26 +1,28 @@
 from PyQt6.QtWidgets import (
     QLabel,
     QVBoxLayout,
-    QHBoxLayout,
     QWidget,
     QComboBox,
-    QLineEdit,
     QPushButton,
-    QStackedWidget,
     QGridLayout,
     QTextEdit,
 )
 from PyQt6.QtCore import Qt
 
 import os
+import traceback
 from ...FileGenerator import file_parse
 
 
 class ViewInfo(QWidget):
-    def __init__(self):
+    def __init__(self, switch_page, mod_info_communicate):
 
         super().__init__()
         self.layout = QVBoxLayout()
+
+        # Functions
+        self.switch_page = switch_page
+        self.mod_info_communicate = mod_info_communicate
 
         # Information
         self.target_folder_list = self.GetSub("ResumeGenerator/Informations")
@@ -30,10 +32,14 @@ class ViewInfo(QWidget):
         self.target_file_path = ""
         self.file_display_text = ""
         self.file_display_simple = ""
+        self.file_display_list = []
+        self.item_title_list = []
 
         # Header
         self.header_label = QLabel("Information Viewer")
-        self.header_label.setFixedSize(200, 40)
+        self.header_label.setFixedHeight(20)
+        self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.header_label.setStyleSheet("font-weight: bold; font-size: 15px;")
         self.layout.addWidget(self.header_label)
 
         # Selector
@@ -112,7 +118,7 @@ class ViewInfo(QWidget):
         self.info_selector.addWidget(file_options, 1, 1)
 
     def folder_selected(self, index) -> None:
-        if index != 0:
+        if index >= 0:
 
             selected_item = self.target_folder_list[index - 1]
             self.target_folder = selected_item
@@ -159,12 +165,35 @@ class ViewInfo(QWidget):
         Modify file structure, implement in stage 3
         """
 
+    @staticmethod
+    def ObtainInfo(target_folder, target_file):
+        """
+        Display the file content
+        """
+        try:
+            fp = file_parse.FileAccMod()
+            file_display_text = fp.print_folder(
+                target_folder, target_file
+            )
+            file_display_simple = fp.print_folder(
+                target_folder, target_file, True
+            )
+            file_display_list, title_list = fp.print_folder_list(
+                target_folder, target_file
+            )
+        except Exception as error:
+            file_display_text = traceback.format_exc()
+            file_display_simple = traceback.format_exc()
+            file_display_list = []
+            title_list = []
+        return file_display_text, file_display_simple, file_display_list, title_list
+
     def FileSelected(self, index):
         """
         not yet fully implemented
         called when both the file and folder is selected by the user
         """
-        if index != 0:
+        if index >= 0:
             self.target_file = self.target_file_list[index - 1]
             self.target_file_path = (
                 "ResumeGenerator/Informations/"
@@ -172,21 +201,24 @@ class ViewInfo(QWidget):
                 + "/"
                 + self.target_file
             )
+
             self.target_file_path_label.setText(self.target_file_path)
-            try:
-                fp = file_parse.FileAccMod()
-                self.file_display_text = fp.print_folder(
-                    self.target_folder, self.target_file
-                )
-                self.file_display_simple = fp.print_folder(
-                    self.target_folder, self.target_file, True
-                )
-                self.file_as_text.setPlainText(self.file_display_text)
-            except Exception as error:
-                self.file_as_text.setPlainText(str(error))
+            self.file_display_text, self.file_display_simple, self.file_display_list, self.item_title_list = self.ObtainInfo(
+                self.target_folder, self.target_file
+            )
+
+            self.file_as_text.setPlainText(self.file_display_text)
 
     def EditSelected(self):
         """
         To be implemented
         Redirects to the modify page and carries forward information
         """
+        if self.target_file_path != "":
+            self.mod_info_communicate(
+                self.target_folder, self.target_file, self.ObtainInfo
+            )
+            self.switch_page(1)
+        else:
+            self.file_display_text = "No file selected"
+            self.file_as_text.setPlainText(self.file_display_text)

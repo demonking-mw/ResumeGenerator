@@ -12,7 +12,7 @@ import sys
 
 
 from . import generate
-from . import view_info
+from . import view_mod
 
 
 class MainPage(QWidget):
@@ -27,7 +27,7 @@ class MainPage(QWidget):
 
         # Add pages to the stack
         self.stack.addWidget(generate.Generate())
-        self.stack.addWidget(view_info.ViewInfo())
+        self.stack.addWidget(view_mod.ViewMod())
 
         # Page selection button
         button_cont = QWidget(self)

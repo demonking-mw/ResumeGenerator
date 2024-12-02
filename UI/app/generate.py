@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QTextEdit,
 )
 import os
+from PyQt6.QtCore import Qt
 from ...FileGenerator import resume_pdf_builder
 
 
@@ -25,7 +26,9 @@ class Generate(QWidget):
         # self.job_resp = ""
         # self.job_req = ""
         self.header_label = QLabel("Resume Generator")
-        self.header_label.setFixedSize(200, 40)
+        self.header_label.setFixedHeight(40)
+        self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.header_label.setStyleSheet("font-weight: bold; font-size: 15px;")
         self.layout.addWidget(self.header_label)
 
         self.folder_section = QHBoxLayout()
