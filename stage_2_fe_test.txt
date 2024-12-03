@@ -1,0 +1,8 @@
+1. open the app
+2. go to the modify tab
+3. select test build
+4. add one item to each section
+5. modify each of them
+6. delete all of them
+7. build a sample resume
+8. find some recruitement info online and click generate

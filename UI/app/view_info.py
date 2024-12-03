@@ -1,26 +1,28 @@
 from PyQt6.QtWidgets import (
     QLabel,
     QVBoxLayout,
-    QHBoxLayout,
     QWidget,
     QComboBox,
-    QLineEdit,
     QPushButton,
-    QStackedWidget,
     QGridLayout,
-    QTextEdit
+    QTextEdit,
 )
 from PyQt6.QtCore import Qt
 
 import os
+import traceback
 from ...FileGenerator import file_parse
 
 
 class ViewInfo(QWidget):
-    def __init__(self):
+    def __init__(self, switch_page, mod_info_communicate):
 
         super().__init__()
         self.layout = QVBoxLayout()
+
+        # Functions
+        self.switch_page = switch_page
+        self.mod_info_communicate = mod_info_communicate
 
         # Information
         self.target_folder_list = self.GetSub("ResumeGenerator/Informations")
@@ -28,10 +30,16 @@ class ViewInfo(QWidget):
         self.target_file_list = []
         self.target_file = ""
         self.target_file_path = ""
+        self.file_display_text = ""
+        self.file_display_simple = ""
+        self.file_display_list = []
+        self.item_title_list = []
 
         # Header
         self.header_label = QLabel("Information Viewer")
-        self.header_label.setFixedSize(200, 40)
+        self.header_label.setFixedHeight(20)
+        self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.header_label.setStyleSheet("font-weight: bold; font-size: 15px;")
         self.layout.addWidget(self.header_label)
 
         # Selector
@@ -52,10 +60,14 @@ class ViewInfo(QWidget):
         self.target_file_path_label = QLabel()
         self.selector.addWidget(self.target_file_path_label)
         self.selector_widget.setLayout(self.selector)
-
+        
         # Displayer: shows everything in the file
         self.info_display_widget = QWidget()
         self.info_display = QVBoxLayout()
+        # Fix folder formatting
+        self.format_fix = QPushButton("Fix Folder Formatting")
+        self.format_fix.clicked.connect(self.fix_file_format)
+        self.info_display.addWidget(self.format_fix)
         # Heading
         self.info_display_heading = QLabel("Section Selected:")
         self.info_display.addWidget(self.info_display_heading)
@@ -63,6 +75,7 @@ class ViewInfo(QWidget):
         self.file_as_text = QTextEdit()
         self.file_as_text.setReadOnly(True)
         self.info_display.addWidget(self.file_as_text)
+
         # Button to modify
         self.modify_button = QPushButton("Modify Selected:")
         self.modify_button.clicked.connect(self.EditSelected)
@@ -75,10 +88,27 @@ class ViewInfo(QWidget):
 
         self.setLayout(self.layout)
 
+    def fix_file_format(self):
+        fp = file_parse.FileAccMod()
+        if self.target_folder != "":
+            fp.construct_folder(
+                [
+                    "HEADING.csv",
+                    "SKILLS.csv",
+                    "EDUCATION.csv",
+                    "EXPERIENCE.csv",
+                    "PROJECTS.csv",
+                ],
+                self.target_folder
+            )
+        else:
+            self.file_display_text = "No folder selected"
+            self.file_as_text.setPlainText(self.file_display_text)
+
     def InfoSelector(self):
-        '''
+        """
         A grid layout that contains 3 dropdowns
-        '''
+        """
         layout = QGridLayout()
         layout.addWidget(QLabel("Select Folder"), 0, 0)
         layout.addWidget(QLabel("Select Section"), 0, 1)
@@ -110,9 +140,9 @@ class ViewInfo(QWidget):
         self.info_selector.addWidget(file_options, 1, 1)
 
     def folder_selected(self, index) -> None:
-        if(index != 0):
+        if index >= 0:
 
-            selected_item = self.target_folder_list[index-1]
+            selected_item = self.target_folder_list[index - 1]
             self.target_folder = selected_item
             folder_path = "ResumeGenerator/Informations/" + selected_item
             self.target_file_list = self.GetFileList(folder_path)
@@ -124,10 +154,10 @@ class ViewInfo(QWidget):
                 if widget:
                     widget.deleteLater()
 
-    def GetSub(self, rel_path:str) -> list:
-        '''
+    def GetSub(self, rel_path: str) -> list:
+        """
         To use this, path starts from ResumeGenerator/...
-        '''
+        """
         abs_file_path = os.path.abspath(rel_path)
         folder_names = [
             name
@@ -141,7 +171,9 @@ class ViewInfo(QWidget):
         if not os.path.isabs(folder_path):
             raise ValueError("The provided path must be an absolute path.")
         if not os.path.isdir(folder_path):
-            raise FileNotFoundError(f"The path '{folder_path}' is not a valid directory.")
+            raise FileNotFoundError(
+                f"The path '{folder_path}' is not a valid directory."
+            )
 
         # List comprehension to filter out directories
         return [
@@ -151,27 +183,64 @@ class ViewInfo(QWidget):
         ]
 
     def ModFile(self):
-        '''
+        """
         Modify file structure, implement in stage 3
-        '''
+        """
+
+    @staticmethod
+    def ObtainInfo(target_folder, target_file):
+        """
+        Display the file content
+        """
+        try:
+            fp = file_parse.FileAccMod()
+            file_display_text = fp.print_folder(
+                target_folder, target_file
+            )
+            file_display_simple = fp.print_folder(
+                target_folder, target_file, True
+            )
+            file_display_list, title_list = fp.print_folder_list(
+                target_folder, target_file
+            )
+        except Exception as error:
+            file_display_text = traceback.format_exc()
+            file_display_simple = traceback.format_exc()
+            file_display_list = []
+            title_list = []
+        return file_display_text, file_display_simple, file_display_list, title_list
 
     def FileSelected(self, index):
-        '''
+        """
         not yet fully implemented
         called when both the file and folder is selected by the user
-        '''
-        if index != 0:
-            self.target_file = self.target_file_list[index-1]
-            self.target_file_path = "ResumeGenerator/Informations/" + self.target_folder + "/" +  self.target_file
+        """
+        if index >= 0:
+            self.target_file = self.target_file_list[index - 1]
+            self.target_file_path = (
+                "ResumeGenerator/Informations/"
+                + self.target_folder
+                + "/"
+                + self.target_file
+            )
+
             self.target_file_path_label.setText(self.target_file_path)
-            try:
-                fp = file_parse.FileAccMod()
-                self.file_as_text.setPlainText(fp.print_folder(self.target_folder, self.target_file))
-            except Exception as error:
-                self.file_as_text.setPlainText(str(error))
+            self.file_display_text, self.file_display_simple, self.file_display_list, self.item_title_list = self.ObtainInfo(
+                self.target_folder, self.target_file
+            )
+
+            self.file_as_text.setPlainText(self.file_display_text)
 
     def EditSelected(self):
-        '''
+        """
         To be implemented
         Redirects to the modify page and carries forward information
-        '''
+        """
+        if self.target_file_path != "":
+            self.mod_info_communicate(
+                self.target_folder, self.target_file, self.ObtainInfo
+            )
+            self.switch_page(1)
+        else:
+            self.file_display_text = "No file selected"
+            self.file_as_text.setPlainText(self.file_display_text)

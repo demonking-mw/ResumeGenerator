@@ -1,8 +1,19 @@
-from PyQt6.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, 
-                             QWidget, QComboBox, QLineEdit, 
-                             QPushButton, QStackedWidget, QTextEdit)
+from PyQt6.QtWidgets import (
+    QLabel,
+    QVBoxLayout,
+    QHBoxLayout,
+    QWidget,
+    QComboBox,
+    QLineEdit,
+    QPushButton,
+    QStackedWidget,
+    QTextEdit,
+)
 import os
+from PyQt6.QtCore import Qt
 from ...FileGenerator import resume_pdf_builder
+import traceback
+
 
 class Generate(QWidget):
     def __init__(self):
@@ -16,7 +27,9 @@ class Generate(QWidget):
         # self.job_resp = ""
         # self.job_req = ""
         self.header_label = QLabel("Resume Generator")
-        self.header_label.setFixedSize(200, 40)
+        self.header_label.setFixedHeight(40)
+        self.header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.header_label.setStyleSheet("font-weight: bold; font-size: 15px;")
         self.layout.addWidget(self.header_label)
 
         self.folder_section = QHBoxLayout()
@@ -150,7 +163,9 @@ class Generate(QWidget):
         rel_path = "ResumeGenerator/Informations/"
         abs_file_path = os.path.abspath(rel_path)
         folder_names = [
-            name for name in os.listdir(abs_file_path) if os.path.isdir(os.path.join(abs_file_path, name))
+            name
+            for name in os.listdir(abs_file_path)
+            if os.path.isdir(os.path.join(abs_file_path, name))
         ]
         return folder_names
 
@@ -176,7 +191,15 @@ class Generate(QWidget):
                     self.conf_button.setEnabled(False)
                     pdf_name = f_name + ".pdf"
                     side_margin = 25
-                    r = resume_pdf_builder.ResumeBuilder(pdf_name, side_margin, self.folder_sel, desc, resp, req, gpt_model=self.model_sel)
+                    r = resume_pdf_builder.ResumeBuilder(
+                        pdf_name,
+                        side_margin,
+                        self.folder_sel,
+                        desc,
+                        resp,
+                        req,
+                        gpt_model=self.model_sel,
+                    )
                     r.build()
                     self.gen_status.setText("Build success, resume downloaded")
                     self.conf_button.setEnabled(True)
@@ -185,6 +208,7 @@ class Generate(QWidget):
                     self.req_input.clear()
                 except Exception as error:
                     self.gen_status.setText(str(error))
+                    traceback.print_exc()
                     self.conf_button.setEnabled(True)
             elif paste_info != "":
                 self.gen_status.setText("Build commenced")
@@ -208,6 +232,7 @@ class Generate(QWidget):
                     self.paste_input.clear()
                 except Exception as error:
                     self.gen_status.setText(str(error))
+                    traceback.print_exc()
                     self.conf_button.setEnabled(True)
             else:
                 self.gen_status.setText("Missing Info!!")
