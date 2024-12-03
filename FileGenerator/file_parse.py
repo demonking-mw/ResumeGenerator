@@ -171,6 +171,24 @@ class FileAccMod:
             writer = csv.writer(file)
             writer.writerows(content)
 
+    def del_by_index(
+        self, folder_name: str, file_name: str, target_loc: int
+    ) -> tuple[list, bool]:
+        """
+        the first item gets the location of 0
+        """
+        content = self.read_file(file_name, folder_name)
+        if target_loc >= len(content):
+            print("INDEX OUT OF BOUNDS")
+            return ["Not Found"], False
+        content.pop(target_loc+1)
+
+        fn = self.main_fp + folder_name + "/" + file_name
+        abs_file_path = os.path.abspath(fn)
+        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+            writer = csv.writer(file)
+            writer.writerows(content)
+
     def mod_by_header_ss(
         self,
         attribute_list: list[list],
@@ -224,6 +242,41 @@ class FileAccMod:
             writer = csv.writer(file)
             writer.writerows(content)
 
+    def mod_by_index_ss(
+        self,
+        attribute_list: list[list],
+        folder_name: str,
+        file_name: str,
+        target_index: int,
+        target_row_header: str,
+        time: str,
+        descriptions: list,
+    ) -> None:
+        """
+        Modify an item in the file by searching for its header
+        """
+        content = self.read_file(file_name, folder_name)
+        if target_index >= len(content):
+            print("INDEX OUT OF BOUNDS")
+            return
+
+        new_att = []
+        for att in attribute_list:
+            curr_att = "/=-z+f]j " + str(att[0]) + " " + str(att[1])
+            new_att.append(curr_att)
+        new_att.append(target_row_header)
+        new_att.append(time)
+        for desc in descriptions:
+            new_att.append(desc)
+        content.pop(target_index)
+        content.insert(target_index, new_att)
+
+        fn = self.main_fp + folder_name + "/" + file_name
+        abs_file_path = os.path.abspath(fn)
+        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+            writer = csv.writer(file)
+            writer.writerows(content)
+
     def construct_folder(
         self,
         section_filenames: list,
@@ -252,7 +305,7 @@ class FileAccMod:
                     elif sec == "SKILLS":
                         writer.writerow(["SKILLS", skills_top])
                     else:
-                        writer.writerow([sec])
+                        writer.writerow([sec, "BP"]) # default bullet point
         return counter
 
     def read_file(self, file_name: str, folder: str) -> list[list]:
@@ -261,7 +314,10 @@ class FileAccMod:
         """
         fn = self.main_fp + folder + "/" + file_name
         abs_file_path = os.path.abspath(fn)
-        return list(csv.reader(open(abs_file_path, "r", encoding=self.encoding)))
+        # return list(csv.reader(open(abs_file_path, "r", encoding=self.encoding)))
+        with open(abs_file_path, "r", encoding=self.encoding) as file:
+            reader = csv.reader(file)
+            return [row for row in reader if any(row)]
 
     def get_all(
         self, section_filenames: list, section_folder_name: str
@@ -304,6 +360,33 @@ class FileAccMod:
         content.insert(location + 1, new_att)
 
         fn = self.main_fp + folder_name + "/" + file_name
+        abs_file_path = os.path.abspath(fn)
+        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
+            writer = csv.writer(file)
+            writer.writerows(content)
+
+    def add_skill(
+        self,
+        attribute_list: list[list],
+        folder_name: str,
+        header: str,
+        location: int = 0,
+    ):
+        """
+        add a line to a standard section. note: each item in attribute_list is a [str, int]
+        location describes where the item is put relative to other ones
+        enter an arbitrarily large number for location for the item to be placed last (say, 1000000)
+        """
+        content = self.read_file("SKILLS.csv", folder_name)
+        new_att = []
+        new_att.append(header)
+        for item in attribute_list:
+            new_att.append(item)
+        if location + 1 > len(content):
+            location = len(content) - 1
+        content.insert(location + 1, new_att)
+
+        fn = self.main_fp + folder_name + "/" + "SKILLS.csv"
         abs_file_path = os.path.abspath(fn)
         with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
             writer = csv.writer(file)

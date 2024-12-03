@@ -60,10 +60,14 @@ class ViewInfo(QWidget):
         self.target_file_path_label = QLabel()
         self.selector.addWidget(self.target_file_path_label)
         self.selector_widget.setLayout(self.selector)
-
+        
         # Displayer: shows everything in the file
         self.info_display_widget = QWidget()
         self.info_display = QVBoxLayout()
+        # Fix folder formatting
+        self.format_fix = QPushButton("Fix Folder Formatting")
+        self.format_fix.clicked.connect(self.fix_file_format)
+        self.info_display.addWidget(self.format_fix)
         # Heading
         self.info_display_heading = QLabel("Section Selected:")
         self.info_display.addWidget(self.info_display_heading)
@@ -71,6 +75,7 @@ class ViewInfo(QWidget):
         self.file_as_text = QTextEdit()
         self.file_as_text.setReadOnly(True)
         self.info_display.addWidget(self.file_as_text)
+
         # Button to modify
         self.modify_button = QPushButton("Modify Selected:")
         self.modify_button.clicked.connect(self.EditSelected)
@@ -82,6 +87,23 @@ class ViewInfo(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.setLayout(self.layout)
+
+    def fix_file_format(self):
+        fp = file_parse.FileAccMod()
+        if self.target_folder != "":
+            fp.construct_folder(
+                [
+                    "HEADING.csv",
+                    "SKILLS.csv",
+                    "EDUCATION.csv",
+                    "EXPERIENCE.csv",
+                    "PROJECTS.csv",
+                ],
+                self.target_folder
+            )
+        else:
+            self.file_display_text = "No folder selected"
+            self.file_as_text.setPlainText(self.file_display_text)
 
     def InfoSelector(self):
         """

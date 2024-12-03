@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
 import os
 from PyQt6.QtCore import Qt
 from ...FileGenerator import resume_pdf_builder
+import traceback
 
 
 class Generate(QWidget):
@@ -207,6 +208,7 @@ class Generate(QWidget):
                     self.req_input.clear()
                 except Exception as error:
                     self.gen_status.setText(str(error))
+                    traceback.print_exc()
                     self.conf_button.setEnabled(True)
             elif paste_info != "":
                 self.gen_status.setText("Build commenced")
@@ -230,6 +232,7 @@ class Generate(QWidget):
                     self.paste_input.clear()
                 except Exception as error:
                     self.gen_status.setText(str(error))
+                    traceback.print_exc()
                     self.conf_button.setEnabled(True)
             else:
                 self.gen_status.setText("Missing Info!!")

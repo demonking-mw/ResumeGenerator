@@ -315,7 +315,7 @@ class ResumeInfo:
         self.skills_info = self.parse_skills(self.all_info_list[1])
         self.all_edu_info = self.parse_standard("EDUCATION", self.all_info_list[2])
         self.all_exp_info = self.parse_standard("EXPERIENCE", self.all_info_list[3])
-        self.all_proj_info = self.parse_standard("PROJECT", self.all_info_list[4])
+        self.all_proj_info = self.parse_standard("PROJECTS", self.all_info_list[4])
         self.heading_info = self.parse_heading(self.all_info_list[0])
 
         # Deal with file
