@@ -18,6 +18,10 @@ class FileAccMod:
         dominant_fp: str = "ResumeGenerator/Informations/",
         encoding: str = "utf-8",
     ) -> None:
+        """
+        Sets up the file path and encoding
+        Initing the class does not specify the folder and file to edit.
+        """
         self.main_fp = dominant_fp
         self.encoding = encoding
 
@@ -48,13 +52,7 @@ class FileAccMod:
             else:
                 new_row.append(curr_file[1][2])
                 curr_file[1] = new_row
-            fn = self.main_fp + folder_name + "/" + "HEADING.csv"
-            abs_file_path = os.path.abspath(fn)
-            with open(
-                abs_file_path, mode="w", newline="", encoding=self.encoding
-            ) as file:
-                writer = csv.writer(file)
-                writer.writerows(curr_file)
+            self.write_to("HEADING.csv", folder_name, curr_file)
             return "completed!"
         except Exception as error:
             return traceback.format_exc()
@@ -76,7 +74,7 @@ class FileAccMod:
 
     def print_folder(self, folder_name, file_name, simplified=False) -> str:
         """
-        returns
+        returns a formatted string of the file
         """
         curr = self.read_file(file_name, folder_name)
         result = ""
@@ -165,29 +163,20 @@ class FileAccMod:
             # FRONTEND: multiple items found, alert user
             print("MULTIPLE ITEMS FOUND ON REPLACE ATTEMPT, REPLACE CANCELLED")
             deleted_result = ["Multiple Found"]
-        fn = self.main_fp + folder_name + "/" + file_name
-        abs_file_path = os.path.abspath(fn)
-        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
-            writer = csv.writer(file)
-            writer.writerows(content)
+        self.write_to(file_name, folder_name, content)
 
     def del_by_index(
         self, folder_name: str, file_name: str, target_loc: int
     ) -> tuple[list, bool]:
         """
+        Delete an item in the file by its location
         the first item gets the location of 0
+        handles no error since there will be a try catch at implementation
         """
         content = self.read_file(file_name, folder_name)
-        if target_loc >= len(content):
-            print("INDEX OUT OF BOUNDS")
-            return ["Not Found"], False
-        content.pop(target_loc+1)
-
-        fn = self.main_fp + folder_name + "/" + file_name
-        abs_file_path = os.path.abspath(fn)
-        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
-            writer = csv.writer(file)
-            writer.writerows(content)
+        item_deleted = content.pop(target_loc+1)
+        self.write_to(file_name, folder_name, content)
+        return item_deleted, True
 
     def mod_by_header_ss(
         self,
@@ -200,6 +189,7 @@ class FileAccMod:
     ) -> None:
         """
         Modify an item in the file by searching for its header
+        prints to the console if 0 or 2+ items are found
         """
         content = self.read_file(file_name, folder_name)
         row = 1
@@ -236,11 +226,7 @@ class FileAccMod:
         else:
             # FRONTEND: multiple items found, alert user
             print("MULTIPLE ITEMS FOUND ON REPLACE ATTEMPT, REPLACE CANCELLED")
-        fn = self.main_fp + folder_name + "/" + file_name
-        abs_file_path = os.path.abspath(fn)
-        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
-            writer = csv.writer(file)
-            writer.writerows(content)
+        self.write_to(file_name, folder_name, content)
 
     def mod_by_index_ss(
         self,
@@ -254,6 +240,7 @@ class FileAccMod:
     ) -> None:
         """
         Modify an item in the file by searching for its header
+        prints to the console if error
         """
         content = self.read_file(file_name, folder_name)
         if target_index >= len(content):
@@ -271,11 +258,7 @@ class FileAccMod:
         content.pop(target_index)
         content.insert(target_index, new_att)
 
-        fn = self.main_fp + folder_name + "/" + file_name
-        abs_file_path = os.path.abspath(fn)
-        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
-            writer = csv.writer(file)
-            writer.writerows(content)
+        self.write_to(file_name, folder_name, content)
 
     def construct_folder(
         self,
@@ -358,7 +341,12 @@ class FileAccMod:
         if location + 1 > len(content):
             location = len(content) - 1
         content.insert(location + 1, new_att)
-
+        self.write_to(file_name, folder_name, content)
+        
+    def write_to(self, file_name: str, folder_name: str, content: list[list]) -> None:
+        """
+        Write a 2d list to a file
+        """
         fn = self.main_fp + folder_name + "/" + file_name
         abs_file_path = os.path.abspath(fn)
         with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
@@ -385,9 +373,4 @@ class FileAccMod:
         if location + 1 > len(content):
             location = len(content) - 1
         content.insert(location + 1, new_att)
-
-        fn = self.main_fp + folder_name + "/" + "SKILLS.csv"
-        abs_file_path = os.path.abspath(fn)
-        with open(abs_file_path, mode="w", newline="", encoding=self.encoding) as file:
-            writer = csv.writer(file)
-            writer.writerows(content)
+        self.write_to("SKILLS.csv", folder_name, content)

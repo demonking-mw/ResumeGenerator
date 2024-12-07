@@ -188,9 +188,10 @@ class ViewInfo(QWidget):
         """
 
     @staticmethod
-    def ObtainInfo(target_folder, target_file):
+    def ObtainInfo(target_folder: str, target_file: str) -> tuple[str, str, list[str], list[str]]:
         """
         Display the file content
+        Return order: text, simple text, list, title list
         """
         try:
             fp = file_parse.FileAccMod()
