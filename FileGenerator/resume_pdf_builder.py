@@ -141,7 +141,7 @@ class ResumeBuilder:
         self.all_fonts = fonts.AllFonts()
 
 
-# Parameters:
+# To run this:
 #######################################
 # pdf_name = "BobSmithResume1.pdf"
 # side_margin = 25

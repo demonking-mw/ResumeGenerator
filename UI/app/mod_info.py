@@ -62,7 +62,11 @@ class ModInfo(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(self.layout)
 
-    def set_info_variables(self):
+    def set_info_variables(self) -> None:
+        '''
+        make __init__ cleaner
+        use the fold view option to have a better time looking at this shit
+        '''
         self.target_folder = ""
         self.target_file = ""
         self.file_display_text = ""
@@ -70,21 +74,27 @@ class ModInfo(QWidget):
         self.file_as_list = []
         self.item_title_list = []
         self.target_item = ""
-        self.target_index = 0
+        self.target_index = -1 # -1 for no selection
 
-    def clear_fields(self):
+    def clear_fields(self) -> None:
+        '''
+        clear the inputs
+        '''
         self.title_input.clear()
         self.time_input.clear()
         self.desc_input.clear()
         self.att_input.clear()
 
-    def return_to_view(self):
-
+    def return_to_view(self) -> None:
+        '''
+        returns to the view_info page
+        clears input fields
+        '''
         self.set_info_variables()
         self.clear_fields()
         self.switch_page(0)
 
-    def display_widget(self):
+    def display_widget(self)  -> None:
         # Displayer: shows everything in the file
         self.info_display_widget = QWidget()
         self.info_display_widget.setFixedHeight(150)
@@ -98,7 +108,7 @@ class ModInfo(QWidget):
         self.info_display.addWidget(self.file_as_text)
         self.info_display_widget.setLayout(self.info_display)
 
-    def operation_widget(self):
+    def operation_widget(self) -> None:
         # Selector
         self.operation_widget = QWidget()
         self.operation_widget.setFixedHeight(100)
@@ -153,7 +163,7 @@ class ModInfo(QWidget):
         # Add
         self.operation_widget.setLayout(self.operation_layout)
 
-    def build_item(self):
+    def build_item(self) -> None:
         """
         Collect the following from the user:
         attribute_list: list[list],
@@ -218,28 +228,42 @@ class ModInfo(QWidget):
         # Add
         self.build_item_widget.setLayout(self.build_item_layout)
 
-    def add_arrow(self):
+    def add_arrow(self) -> None:
+        '''
+        adds an arrow to the attribute input
+        exact format as anticipated
+        '''
         cursor = self.att_input.textCursor()
         cursor.insertText("----->")
 
-    def info_selected(self, index):
+    def info_selected(self, index: int) -> None:
+        '''
+        handle the selection of an item
+        '''
         if index <= 0:
             self.target_item = ""
             self.add_button.setText("Add to front")
-            self.target_index = 0
+            self.target_index = -1
         else:
             self.target_item = self.item_title_list[index - 1]
             self.add_button.setText("Add After Selected")
             self.target_index = index - 1
 
-    def communicate(self, target_folder, target_file, ObtainInfo):
-
+    def communicate(self, target_folder: str, target_file: str, ObtainInfo) -> None:
+        """
+        Receiver of information from view_info
+        saves the need of running file parse again on start
+        ObtainInfo is a function to obtain info given by view_info
+        
+        def ObtainInfo(target_folder: str, target_file: str) -> 
+        tuple[str, str, list[str], list[str]]
+        """
         self.target_folder = target_folder
         self.target_file = target_file
         self.ObtainInfo = ObtainInfo
         self.info_update()
 
-    def change_item(self, mode):
+    def change_item(self, mode: int) -> None:
         """
         mode=0 for add
         mode=1 for modify
@@ -326,15 +350,32 @@ class ModInfo(QWidget):
                         self.stat_display.setText("Mod S.S error ->"+ str(e))
         self.info_update()
 
-    def delete_item(self):
+    def delete_item(self) -> tuple[list, bool]:
+        """
+        deletes the item selected 
+        using delete by index function from file_parse
+        returns the item deleted as a list
+        the bool is for success or failure
+        """
+        if self.target_index == -1:
+            self.stat_display.setText("No item selected")
+            self.info_update()
+            return [], False
+
         try:
             fp = file_parse.FileAccMod()
-            fp.del_by_index(self.target_folder, self.target_file, self.target_index)
+            deleted_content = fp.del_by_index(self.target_folder, self.target_file, self.target_index)
+            self.stat_display.setText("Delete success")
+            self.info_update()
+            return deleted_content, True
         except Exception as e:
+            self.info_update()
             self.stat_display.setText("Delete error ->"+ str(e))
-        self.info_update()
 
-    def info_update(self):
+    def info_update(self) -> None:
+        '''
+        updates the information displayed
+        '''
         (
             self.file_display_text,
             self.file_display_simple,
@@ -346,6 +387,9 @@ class ModInfo(QWidget):
         self.info_selector.addItem("SELECT ITEM")
         self.info_selector.addItems(self.item_title_list)
 
-    def add_item_on_click(self):
+    def add_item_on_click(self) -> None:
+        '''
+        Handles onclick for add item button
+        '''
         self.change_item(0)
         self.info_update()
