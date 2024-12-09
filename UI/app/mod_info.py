@@ -63,10 +63,10 @@ class ModInfo(QWidget):
         self.setLayout(self.layout)
 
     def set_info_variables(self) -> None:
-        '''
+        """
         make __init__ cleaner
         use the fold view option to have a better time looking at this shit
-        '''
+        """
         self.target_folder = ""
         self.target_file = ""
         self.file_display_text = ""
@@ -74,27 +74,27 @@ class ModInfo(QWidget):
         self.file_as_list = []
         self.item_title_list = []
         self.target_item = ""
-        self.target_index = -1 # -1 for no selection
+        self.target_index = -1  # -1 for no selection
 
     def clear_fields(self) -> None:
-        '''
+        """
         clear the inputs
-        '''
+        """
         self.title_input.clear()
         self.time_input.clear()
         self.desc_input.clear()
         self.att_input.clear()
 
     def return_to_view(self) -> None:
-        '''
+        """
         returns to the view_info page
         clears input fields
-        '''
+        """
         self.set_info_variables()
         self.clear_fields()
         self.switch_page(0)
 
-    def display_widget(self)  -> None:
+    def display_widget(self) -> None:
         # Displayer: shows everything in the file
         self.info_display_widget = QWidget()
         self.info_display_widget.setFixedHeight(150)
@@ -229,17 +229,17 @@ class ModInfo(QWidget):
         self.build_item_widget.setLayout(self.build_item_layout)
 
     def add_arrow(self) -> None:
-        '''
+        """
         adds an arrow to the attribute input
         exact format as anticipated
-        '''
+        """
         cursor = self.att_input.textCursor()
         cursor.insertText("----->")
 
     def info_selected(self, index: int) -> None:
-        '''
+        """
         handle the selection of an item
-        '''
+        """
         if index <= 0:
             self.target_item = ""
             self.add_button.setText("Add to front")
@@ -254,8 +254,8 @@ class ModInfo(QWidget):
         Receiver of information from view_info
         saves the need of running file parse again on start
         ObtainInfo is a function to obtain info given by view_info
-        
-        def ObtainInfo(target_folder: str, target_file: str) -> 
+
+        def ObtainInfo(target_folder: str, target_file: str) ->
         tuple[str, str, list[str], list[str]]
         """
         self.target_folder = target_folder
@@ -297,62 +297,99 @@ class ModInfo(QWidget):
                     fp.change_header(self.target_folder, name, desc[0])
                 self.clear_fields()
             except Exception as e:
-                self.stat_display.setText("Mod header error ->"+ str(e))
-        else:
-            if not att_format:
-                self.stat_display.setText("Attribute format error")
-                return
-            if self.target_file == "SKILLS.csv":
-                if mode == 0:
-                    fp = file_parse.FileAccMod()
-                    fp.add_skill(desc, self.target_folder, name, self.target_index+1)
-                    self.stat_display.setText(
-                        "skills added with sub-traits from description"
-                    )
-                else:
-                    self.stat_display.setText("delete the skill, then re-add with different value")
+                self.stat_display.setText("Mod header error ->" + str(e))
+            self.info_update()
+            return
 
+        if not att_format:
+            self.stat_display.setText("Attribute format error")
+            return
+        if self.target_file == "SKILLS.csv":
+            if mode == 0:
+                fp = file_parse.FileAccMod()
+                fp.add_skill(desc, self.target_folder, name, self.target_index + 1)
+                self.stat_display.setText(
+                    "skills added with sub-traits from description"
+                )
             else:
-                # CHange standard section
-                if mode == 0:
-                    # add
-                    self.stat_display.setText("Adding to standard section")
-                    try:
-                        fp = file_parse.FileAccMod()
-                        fp.add_line_ss(
-                            formatted_attributes,
-                            self.target_folder,
-                            self.target_file,
-                            name,
-                            inp_time,
-                            desc,
-                            self.target_index + 1,
-                        )
-                        self.clear_fields()
-                    except Exception as e:
-                        self.stat_display.setText("Add S.S error ->"+ str(e))
+                self.stat_display.setText(
+                    "delete the skill, then re-add with different value"
+                )
+            self.info_update()
+            return
+
+        # CHange standard section
+        if mode == 0:
+            # add
+            self.stat_display.setText("Adding to standard section")
+            try:
+                fp = file_parse.FileAccMod()
+                fp.add_line_ss(
+                    formatted_attributes,
+                    self.target_folder,
+                    self.target_file,
+                    name,
+                    inp_time,
+                    desc,
+                    self.target_index + 1,
+                )
+                self.clear_fields()
+            except Exception as e:
+                self.stat_display.setText("Add S.S error ->" + str(e))
+            self.info_update()
+            return
+        else:
+            # modify
+            if not inp_time and desc == [""] and len(formatted_attributes) == 0:
+
+                if self.target_index != -1:
+                    # populate the fields with the current values
+                    splitted_display = self.file_display_text.split("\n\n\n")[
+                        self.target_index+1
+                    ].split("\nTraits:\n")
+                    text_header, *rest = splitted_display[0].split("\n", 1)
+                    text_header_list = text_header.split("----->")
+                    rest = rest[0]  # error if rest is empty, for debugging
+                    self.title_input.setText(text_header_list[0])
+                    self.time_input.setText(text_header_list[1])
+                    self.desc_input.setPlainText(rest)
+                    self.att_input.setPlainText(splitted_display[1])
+                    self.stat_display.setText("Change the section, then click modify")
                 else:
-                    # mod
-                    self.stat_display.setText("Modifying standard section")
-                    try:
-                        fp = file_parse.FileAccMod()
-                        fp.mod_by_index_ss(
-                            formatted_attributes,
-                            self.target_folder,
-                            self.target_file,
-                            self.target_index+1, # True index including header
-                            self.item_title_list[self.target_index],
-                            inp_time,
-                            desc,
-                        )
-                        self.clear_fields()
-                    except Exception as e:
-                        self.stat_display.setText("Mod S.S error ->"+ str(e))
-        self.info_update()
+                    self.stat_display.setText("No item selected")
+                return
+            if (
+                not inp_time
+                or len(desc) == 0
+                or not att_format
+                or len(formatted_attributes) == 0
+                or self.target_index == -1
+            ):
+                self.stat_display.setText(
+                    "Please fill all fields and click modify again"
+                )
+                return
+            try:
+                fp = file_parse.FileAccMod()
+                fp.mod_by_index_ss(
+                    formatted_attributes,
+                    self.target_folder,
+                    self.target_file,
+                    self.target_index + 1,  # True index including header
+                    self.item_title_list[self.target_index],
+                    inp_time,
+                    desc,
+                )
+                self.clear_fields()
+                self.stat_display.setText("Modified standard section")
+            except Exception as e:
+                self.stat_display.setText("Mod S.S error ->" + str(e))
+            self.info_update()
+            return
 
     def delete_item(self) -> tuple[list, bool]:
         """
-        deletes the item selected 
+        deletes the item selected
         using delete by index function from file_parse
         returns the item deleted as a list
         the bool is for success or failure
@@ -364,18 +401,20 @@ class ModInfo(QWidget):
 
         try:
             fp = file_parse.FileAccMod()
-            deleted_content = fp.del_by_index(self.target_folder, self.target_file, self.target_index)
+            deleted_content = fp.del_by_index(
+                self.target_folder, self.target_file, self.target_index
+            )
             self.stat_display.setText("Delete success")
             self.info_update()
             return deleted_content, True
         except Exception as e:
             self.info_update()
-            self.stat_display.setText("Delete error ->"+ str(e))
+            self.stat_display.setText("Delete error ->" + str(e))
 
     def info_update(self) -> None:
-        '''
+        """
         updates the information displayed
-        '''
+        """
         (
             self.file_display_text,
             self.file_display_simple,
@@ -388,8 +427,8 @@ class ModInfo(QWidget):
         self.info_selector.addItems(self.item_title_list)
 
     def add_item_on_click(self) -> None:
-        '''
+        """
         Handles onclick for add item button
-        '''
+        """
         self.change_item(0)
         self.info_update()

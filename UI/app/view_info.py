@@ -60,7 +60,7 @@ class ViewInfo(QWidget):
         self.target_file_path_label = QLabel()
         self.selector.addWidget(self.target_file_path_label)
         self.selector_widget.setLayout(self.selector)
-        
+
         # Displayer: shows everything in the file
         self.info_display_widget = QWidget()
         self.info_display = QVBoxLayout()
@@ -99,7 +99,7 @@ class ViewInfo(QWidget):
                     "EXPERIENCE.csv",
                     "PROJECTS.csv",
                 ],
-                self.target_folder
+                self.target_folder,
             )
         else:
             self.file_display_text = "No folder selected"
@@ -188,19 +188,17 @@ class ViewInfo(QWidget):
         """
 
     @staticmethod
-    def ObtainInfo(target_folder: str, target_file: str) -> tuple[str, str, list[str], list[str]]:
+    def ObtainInfo(
+        target_folder: str, target_file: str
+    ) -> tuple[str, str, list[str], list[str]]:
         """
         Display the file content
         Return order: text, simple text, list, title list
         """
         try:
             fp = file_parse.FileAccMod()
-            file_display_text = fp.print_folder(
-                target_folder, target_file
-            )
-            file_display_simple = fp.print_folder(
-                target_folder, target_file, True
-            )
+            file_display_text = fp.print_folder(target_folder, target_file)
+            file_display_simple = fp.print_folder(target_folder, target_file, True)
             file_display_list, title_list = fp.print_folder_list(
                 target_folder, target_file
             )
@@ -226,9 +224,12 @@ class ViewInfo(QWidget):
             )
 
             self.target_file_path_label.setText(self.target_file_path)
-            self.file_display_text, self.file_display_simple, self.file_display_list, self.item_title_list = self.ObtainInfo(
-                self.target_folder, self.target_file
-            )
+            (
+                self.file_display_text,
+                self.file_display_simple,
+                self.file_display_list,
+                self.item_title_list,
+            ) = self.ObtainInfo(self.target_folder, self.target_file)
 
             self.file_as_text.setPlainText(self.file_display_text)
 
