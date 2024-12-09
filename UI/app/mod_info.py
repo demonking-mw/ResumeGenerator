@@ -12,7 +12,6 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 
-import os
 from ...FileGenerator import file_parse
 from . import view_info
 
@@ -317,10 +316,19 @@ class ModInfo(QWidget):
                 )
             self.info_update()
             return
-
+        incomplete_input = (
+            not inp_time
+            or desc == [""]
+            or not att_format
+            or att == [""]
+            or self.target_index == -1
+        )
         # CHange standard section
         if mode == 0:
             # add
+            if incomplete_input:
+                self.stat_display.setText("Please fill all fields and click add again")
+                return
             self.stat_display.setText("Adding to standard section")
             try:
                 fp = file_parse.FileAccMod()
@@ -340,12 +348,12 @@ class ModInfo(QWidget):
             return
         else:
             # modify
-            if not inp_time and desc == [""] and len(formatted_attributes) == 0:
+            if not inp_time and desc == [""] and att == [""]:
 
                 if self.target_index != -1:
                     # populate the fields with the current values
                     splitted_display = self.file_display_text.split("\n\n\n")[
-                        self.target_index+1
+                        self.target_index + 1
                     ].split("\nTraits:\n")
                     text_header, *rest = splitted_display[0].split("\n", 1)
                     text_header_list = text_header.split("----->")
@@ -358,13 +366,7 @@ class ModInfo(QWidget):
                 else:
                     self.stat_display.setText("No item selected")
                 return
-            if (
-                not inp_time
-                or len(desc) == 0
-                or not att_format
-                or len(formatted_attributes) == 0
-                or self.target_index == -1
-            ):
+            if incomplete_input:
                 self.stat_display.setText(
                     "Please fill all fields and click modify again"
                 )

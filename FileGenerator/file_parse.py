@@ -59,7 +59,7 @@ class FileAccMod:
 
     def print_folder_list(self, folder_name: str, file_name) -> tuple[list, list]:
         """
-        returns a list of formatted items
+        returns a list of formatted items in a file
         only the header and the time is displayed
         heading is removed
         """
