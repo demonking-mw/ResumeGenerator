@@ -166,6 +166,7 @@ class Generate(QWidget):
             name
             for name in os.listdir(abs_file_path)
             if os.path.isdir(os.path.join(abs_file_path, name))
+            and name != "__init__.py"
         ]
         return folder_names
 

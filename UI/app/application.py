@@ -26,8 +26,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
+class RunApplication:
+    def __init__(self):
+        self.app = QApplication(sys.argv)
+        self.window = MainWindow()
+        self.window.show()
+        sys.exit(self.app.exec())

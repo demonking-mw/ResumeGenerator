@@ -57,14 +57,14 @@ class FileAccMod:
         except Exception as error:
             return traceback.format_exc()
 
-    def print_folder_list(self, folder_name: str, file_name) -> list:
+    def print_folder_list(self, folder_name: str, file_name) -> tuple[list, list]:
         """
-        returns a list of formatted items
+        returns a list of formatted items in a file
         only the header and the time is displayed
         heading is removed
         """
         curr = self.read_file(file_name, folder_name)
-        result = []
+        result = []  # list of formatted items
         title_list = []
         for i in range(1, len(curr)):
             formatted, curr_title = self.style_disp_item_ss(curr[i], True)
@@ -80,8 +80,8 @@ class FileAccMod:
         result = ""
         nx = "\n"
         bk = "\n\n"
-        result += curr[0][0] + bk
-        title_wasted = "" # catch the title output to avoid error
+        result += curr[0][0] + bk + nx
+        title_wasted = ""  # catch the title output to avoid error
         for i in range(1, len(curr)):
             formatted, title_wasted = self.style_disp_item_ss(curr[i], simplified)
             if simplified:
@@ -92,7 +92,9 @@ class FileAccMod:
             result += bk
         return result
 
-    def style_disp_item_ss(self, raw_list: list, brief: bool = False) -> list:
+    def style_disp_item_ss(
+        self, raw_list: list, brief: bool = False
+    ) -> tuple[list, str]:
         """
         Style an item for display
         Ideally, each item in the list occupies a line
@@ -115,14 +117,14 @@ class FileAccMod:
             information_list.append(item)
 
         result_list = []
-        result_list.append(title_info + "   ---   " + time_info)
+        result_list.append(title_info + "----->" + time_info)
         if brief:
             return result_list, title_info
         for info in information_list:
             result_list.append(info)
         result_list.append("Traits:")
         for info in traits_list:
-            result_list.append(str(info[0]) + "   ->   " + str(info[1]))
+            result_list.append(str(info[0]) + "----->" + str(info[1]))
         return result_list, title_info
 
     def del_by_header_ss(
@@ -174,7 +176,7 @@ class FileAccMod:
         handles no error since there will be a try catch at implementation
         """
         content = self.read_file(file_name, folder_name)
-        item_deleted = content.pop(target_loc+1)
+        item_deleted = content.pop(target_loc + 1)
         self.write_to(file_name, folder_name, content)
         return item_deleted, True
 
@@ -277,18 +279,32 @@ class FileAccMod:
             sec = sect[:-4]
             fn = self.main_fp + section_folder_name + "/" + sect
             abs_file_path = os.path.abspath(fn)
+            edit_selected = False
+            prev_content = []
             if (not os.path.isfile(abs_file_path)) or force_const:
+                edit_selected = True
+            else:
+                prev_content = self.read_file(sect, section_folder_name)
+                try:
+                    if prev_content[0][0] != sec:
+                        edit_selected = True
+                    elif len(prev_content[0]) <= 1:
+                        prev_content.pop(0)
+                        edit_selected = True
+                    elif prev_content[0][1] == "":
+                        prev_content.pop(0)
+                        edit_selected = True
+                except Exception as error:
+                    edit_selected = True
+            if edit_selected:
                 counter += 1
-                with open(
-                    abs_file_path, mode="w", newline="", encoding=self.encoding
-                ) as file:
-                    writer = csv.writer(file)
-                    if sec == "HEADING":
-                        writer.writerow(["HEADING", heading_top])
-                    elif sec == "SKILLS":
-                        writer.writerow(["SKILLS", skills_top])
-                    else:
-                        writer.writerow([sec, "BP"]) # default bullet point
+                if sec == "HEADING":
+                    prev_content.insert(0, ["HEADING", heading_top])
+                elif sec == "SKILLS":
+                    prev_content.insert(0, ["SKILLS", skills_top])
+                else:
+                    prev_content.insert(0, [sec, "BP"])  # default bullet point
+                self.write_to(sect, section_folder_name, prev_content)
         return counter
 
     def read_file(self, file_name: str, folder: str) -> list[list]:
@@ -342,7 +358,7 @@ class FileAccMod:
             location = len(content) - 1
         content.insert(location + 1, new_att)
         self.write_to(file_name, folder_name, content)
-        
+
     def write_to(self, file_name: str, folder_name: str, content: list[list]) -> None:
         """
         Write a 2d list to a file

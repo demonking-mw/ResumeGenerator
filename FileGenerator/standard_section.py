@@ -8,6 +8,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
+from . import fonts
+
 
 class StandardSection:
     """
@@ -18,43 +20,7 @@ class StandardSection:
 
     # style
     #######################################################################
-    __DEFAULT_FONT_TITLE = ParagraphStyle(
-        name="SectTitleFont",
-        fontName="Times-Bold",
-        fontSize=14,
-        textColor=colors.black,
-        alignment=1,
-        spaceAfter=0,
-        leading=12,
-    )
-    __DEFAULT_FONT_SUBTITLE = ParagraphStyle(
-        name="SectTitleFont",
-        fontName="Times-Roman",
-        fontSize=13,
-        textColor=colors.black,
-        spaceBefore=8,
-        alignment=0,
-        spaceAfter=0,
-        leading=0,
-    )
-    __DEFAULT_FONT_SUBRIGHT = ParagraphStyle(
-        name="SectTitleFont",
-        fontName="Times-Roman",
-        fontSize=13,
-        textColor=colors.black,
-        alignment=2,
-        spaceAfter=0,
-        leading=15,
-    )
-    __DEFAULT_FONT_TEXT = ParagraphStyle(
-        name="paraFont",
-        fontName="Times-Roman",
-        fontSize=11,
-        textColor=colors.black,
-        alignment=0,
-        spaceAfter=0,
-        leading=12,
-    )
+    
 
     __DEFAULT_SIDE_MARGIN = 20
     __DEFAULT_TOP_MARGIN = 5
@@ -66,10 +32,6 @@ class StandardSection:
         self,
         title: str,
         all_info: list[list],
-        title_font=None,
-        subtitle_font=None,
-        subright_font=None,
-        text_font=None,
         side_margin=None,
         top_margin=None,
         height_buffer=None,
@@ -77,27 +39,21 @@ class StandardSection:
     ) -> None:
         self.title = title
         self.raw_info_list = all_info
-
         self.bullet_point = False
         self.attribute_weight_list = []
-        self.font_title = self.__DEFAULT_FONT_TITLE
-        self.font_subtitle = self.__DEFAULT_FONT_SUBTITLE
-        self.font_subright = self.__DEFAULT_FONT_SUBRIGHT
-        self.font_text = self.__DEFAULT_FONT_TEXT
+        
+        self.all_fonts = fonts.AllFonts()
+        self.font_title = self.all_fonts.name_font
+        self.font_subtitle = self.all_fonts.subsection_title
+        self.font_subright = self.all_fonts.subright_title
+        self.font_text = self.all_fonts.text_font_standard_sec
         self.side_margin = self.__DEFAULT_SIDE_MARGIN
         self.top_margin = self.__DEFAULT_TOP_MARGIN
         self.height_buffer = self.__DEFAULT_HEIGHT_BUFFER
 
         if bullet_point:
             self.bullet_point = bullet_point
-        if title_font:
-            self.font_title = title_font
-        if subtitle_font:
-            self.font_subtitle = subtitle_font
-        if subright_font:
-            self.font_subright = subright_font
-        if text_font:
-            self.font_text = text_font
+        
         if height_buffer:
             self.height_buffer = height_buffer
         if self.bullet_point:

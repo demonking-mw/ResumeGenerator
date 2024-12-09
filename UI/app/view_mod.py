@@ -25,7 +25,7 @@ class ViewMod(QWidget):
 
         self.mod_info = mod_info.ModInfo(self.switch_page)
         self.view_info = view_info.ViewInfo(self.switch_page, self.mod_info.communicate)
-        
+
         self.stack.addWidget(self.view_info)
         self.stack.addWidget(self.mod_info)
         self.stack.setCurrentIndex(0)

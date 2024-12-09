@@ -11,8 +11,7 @@ class AllFonts:
     """
     Stores all font info
     """
-
-    section_title = ParagraphStyle(
+    resume_title = ParagraphStyle(
         name="SectTitleFont",
         fontName="Times-Bold",
         fontSize=14,
@@ -21,9 +20,19 @@ class AllFonts:
         spaceAfter=0,
         leading=12,
     )
-    subsection_title = ParagraphStyle(
+    
+    section_title = ParagraphStyle(
         name="SectTitleFont",
-        fontName="Times-Roman",
+        fontName="Times-Bold",
+        fontSize=14,
+        textColor=colors.black,
+        alignment=1,
+        spaceAfter=0,
+        leading=15,
+    )
+    subsection_title = ParagraphStyle(
+        name="SubTitleFont",
+        fontName="Times-Bold",
         fontSize=13,
         textColor=colors.black,
         spaceBefore=8,
@@ -33,12 +42,12 @@ class AllFonts:
     )
     subright_title = ParagraphStyle(
         name="SectTitleFont",
-        fontName="Times-Roman",
+        fontName="Times-Bold",
         fontSize=13,
         textColor=colors.black,
         alignment=2,
         spaceAfter=0,
-        leading=15,
+        leading=18,
     )
     text_font_standard_sec = ParagraphStyle(
         name="paraFont",
@@ -47,7 +56,7 @@ class AllFonts:
         textColor=colors.black,
         alignment=0,
         spaceAfter=0,
-        leading=12,
+        leading=16,
     )
     name_font = ParagraphStyle(
         name="nameFont",
@@ -86,7 +95,7 @@ class AllFonts:
         leftIndent=A4[0] / 2,
         alignment=0,
         spaceAfter=0,
-        leading=12,
+        leading=14,
     )
 
     def __init__(self) -> None:
