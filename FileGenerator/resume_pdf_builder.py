@@ -59,6 +59,7 @@ class ResumeBuilder:
         """
         Builds the content list for a section that uses standard format
         Here: each element of content is [title, date, description]
+        Comm: takes in a standard section
         """
         section_content = []
         section_title_1 = Paragraph(standard_sec.title, standard_sec.font_title)
@@ -79,6 +80,9 @@ class ResumeBuilder:
         # Make the file path
         downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
         pdf_path = os.path.join(downloads_folder, self.pdf_name)
+        
+        # REPORT LAB SPECIFIC
+        ####################################################################################
         # Prepare a canvas object
         c = canvas.Canvas(pdf_path, pagesize=A4)
         c.setLineWidth(0.3)
@@ -141,10 +145,3 @@ class ResumeBuilder:
         self.all_fonts = fonts.AllFonts()
 
 
-# To run this:
-#######################################
-# pdf_name = "BobSmithResume1.pdf"
-# side_margin = 25
-# r = ResumeBuilder(pdf_name, side_margin, "Accurate")
-# r.build()
-#######################################
