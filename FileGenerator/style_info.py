@@ -32,14 +32,15 @@ from reportlab.lib.pagesizes import A4
 
 @dataclasses.dataclass
 class FontAttributes:
-    name: str = None
-    font_name: str = None
-    font_size: int = None
-    text_color_hex: str = None # hex color
-    alignment: int = None
-    space_before: int = None
-    space_after: int = None
-    leading: int = None
+    name: str
+    font_name: str
+    font_size: int
+    text_color_hex: str # hex color
+    alignment: int
+    space_before: int
+    space_after: int
+    leading: int
+    left_indent: int = None
 
 @dataclasses.dataclass
 @dataclasses.dataclass
@@ -48,13 +49,20 @@ class SectionAttributes:
     top_margin: int = None
     height_buffer: int = None
     wrap_forgive: int = None
-    bullet_point: bool = None
     bullet_symbol: str = None
     paper_width: int = None
 
 class StyleInfo:
     """
     A class that stores all custom fonts/paragraph styles 
+    
+    A StyleInfo as a font is StyleInfo(font_attributes=FontAttributes(...))
+    
+    A StyleInfo as a section is:
+    StyleInfo(section_attributes=SectionAttributes(...), other_attributes, font_lib={listof StyleInfo-as-font})
+    
+    A StyleInfo as a resume is:
+    StyleInfo(section_attributes=SectionAttributes(...(default behavior)), other_attributes, subStyleInfo={listof StyleInfo-as-section}, font_lib={listof StyleInfo-as-font})
     """
     def __init__(self, font_attributes: FontAttributes=None, section_attributes: SectionAttributes=None, other_attributes: dict[str, any]=None, subStyleInfo: dict[str, 'StyleInfo']=None) -> None:
         self.font_attributes = font_attributes
@@ -68,6 +76,9 @@ class StyleInfo:
         '''
         if not self.font_attributes:
             raise ValueError("Font attributes are not set")
+        left_ind = 0
+        if self.font_attributes.left_indent:
+            left_ind = self.font_attributes.left_indent
         return ParagraphStyle(
             name=self.font_attributes.name,
             fontName=self.font_attributes.font_name,
@@ -77,6 +88,7 @@ class StyleInfo:
             spaceBefore=self.font_attributes.space_before,
             spaceAfter=self.font_attributes.space_after,
             leading=self.font_attributes.leading,
+            leftIndent=left_ind
         )
     
     

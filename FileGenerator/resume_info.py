@@ -14,7 +14,7 @@ import dataclasses
 import math
 from reportlab.lib.pagesizes import A4
 
-from . import fonts
+from . import styles
 from . import standard_section
 from . import gpt_attribute
 from . import file_parse
@@ -47,8 +47,10 @@ class ResumeInfo:
         """
         result = 0
         result += header_data_class.top_space
-        result += self.custom_fonts.name_font.leading
-        result += self.custom_fonts.personal_info_font.leading
+        result += self.resume_style.subsections["HEADING"].subsections["heading_name_font"].font_attributes.leading
+        #result += self.custom_fonts.name_font.leading
+        result += self.resume_style.subsections["HEADING"].subsections["heading_desc_font"].font_attributes.leading
+        #result += self.custom_fonts.personal_info_font.leading
         result += header_data_class.height_buffer
         return result
 
@@ -57,9 +59,12 @@ class ResumeInfo:
         Gets the supposed height for the skills section
         """
         result = 0
-        result += self.custom_fonts.section_title.leading
+
+        result += self.resume_style.subsections["SKILLS"].subsections["title_font"].font_attributes.leading
+        #result += self.custom_fonts.section_title.leading
         vert = math.ceil(len(skills_data_class.skills_list) / 2)
-        result += vert * self.custom_fonts.point_right.leading
+        result += vert * self.resume_style.subsections["SKILLS"].subsections["point_right_font"].font_attributes.leading
+        #self.custom_fonts.point_right.leading
         result += skills_data_class.height_buffer
         return result
 
@@ -288,8 +293,10 @@ class ResumeInfo:
         ##################################################################
         # Basic Info
         ##################################################################
-
-        self.custom_fonts = fonts.AllFonts()
+        
+        self.resume_style = styles.ALlStyles().resume_style_0
+        #StyleInfo as a resume
+        #self.custom_fonts = fonts.AllFonts()
         self.topic_list = ["HEADING", "SKILLS", "EDUCATION", "EXPERIENCE", "PROJECTS"]
         self.section_filenames = [
             "HEADING.csv",

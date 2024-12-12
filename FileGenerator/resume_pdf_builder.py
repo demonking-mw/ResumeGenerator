@@ -3,7 +3,7 @@ from reportlab.platypus import Frame, Paragraph, Spacer
 from reportlab.pdfgen import canvas
 import os
 from . import resume_info
-from . import fonts
+from . import styles
 
 
 class ResumeBuilder:
@@ -39,19 +39,19 @@ class ResumeBuilder:
         Builds the content list for a section that uses skills format
         """
         section_content = []
-        section_title_1 = Paragraph(skills_info.title, self.all_fonts.section_title)
+        section_title_1 = Paragraph(skills_info.title, self.resume_style.subsections["SKILLS"].subsections["title_font"].get_paragraph_style())
         section_content.append(section_title_1)
         skill_items = skills_info.skills_list
         counter = 0
         while counter < (len(skill_items) - 1):
-            content_1 = Paragraph(skill_items[counter], self.all_fonts.point_left)
+            content_1 = Paragraph(skill_items[counter], self.resume_style.subsections["SKILLS"].subsections["point_left_font"].get_paragraph_style())
             counter += 1
-            content_2 = Paragraph(skill_items[counter], self.all_fonts.point_right)
+            content_2 = Paragraph(skill_items[counter], self.resume_style.subsections["SKILLS"].subsections["point_right_font"].get_paragraph_style())
             section_content.append(content_1)
             section_content.append(content_2)
             counter += 1
         if counter < len(skill_items):
-            content_1 = Paragraph(skill_items[counter], self.all_fonts.point_left)
+            content_1 = Paragraph(skill_items[counter], self.resume_style.subsections["SKILLS"].subsections["point_left_font"].get_paragraph_style())
             section_content.append(content_1)
         return section_content
 
@@ -95,10 +95,11 @@ class ResumeBuilder:
 
         # Two paragraphs for the header
         custom_space = Spacer(width=0, height=header_container.top_space)
-        title_text = Paragraph(header_container.title, self.all_fonts.name_font)
+        title_text = Paragraph(header_container.title, self.resume_style.subsections["HEADING"].subsections["heading_name_font"].get_paragraph_style())
         basic_info_text = Paragraph(
-            header_container.header_basic_info, self.all_fonts.personal_info_font
+            header_container.header_basic_info, self.resume_style.subsections["HEADING"].subsections["heading_desc_font"].get_paragraph_style()
         )
+        #self.all_fonts.personal_info_font
 
         # Add to this array in order to populate the title
         header_content = [custom_space, title_text, basic_info_text]
@@ -142,6 +143,7 @@ class ResumeBuilder:
         self.resume_informations = resume_info.ResumeInfo(
             info_folder, gpt_model, job_sum, job_resp, job_req, all_job_info
         )
-        self.all_fonts = fonts.AllFonts()
+        self.resume_style = styles.ALlStyles().resume_style_0
+        #self.all_fonts = fonts.AllFonts()
 
 
