@@ -16,12 +16,14 @@ STAGE2:
     - init page where user enters their own openai api key -Optional
     - modification page to make editing resume information easy -V
     - generator page for easy use -V
-    - initial testing of the app and the backend
+    - initial testing of the app and the backend -V
     - publish for free use as an app
 - Improve backend:
     - write edit and remove function for items -V
     - write a display function that gives out all useful informations in a neat format -V
     - write function to edit specific attribute for some item -V
+
+Stage 2 is mostly complete. More testing awaits
 
 STAGE3+:
 - Implement more advanced frontend

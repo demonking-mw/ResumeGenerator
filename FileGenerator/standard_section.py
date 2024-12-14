@@ -8,7 +8,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
-from . import fonts
+from . import styles
+from . import style_info
 
 
 class StandardSection:
@@ -16,56 +17,71 @@ class StandardSection:
     Contains all the information to build a section of the resume
     To define it: the __init__ takes:
     title, list[list[str]], XXX_font: fonts, XXX_margin: int
+    PENDING TASK: finish up this such that every styling is in terms of StyleInfo
     """
 
-    # style
+        # style
     #######################################################################
     
 
-    __DEFAULT_SIDE_MARGIN = 20
-    __DEFAULT_TOP_MARGIN = 5
-    __DEFAULT_HEIGHT_BUFFER = 10
-    __WRAP_FORGIVE = 20
+    #__DEFAULT_SIDE_MARGIN = 20
+    #__DEFAULT_TOP_MARGIN = 5
+    #__DEFAULT_HEIGHT_BUFFER = 10
+    #__WRAP_FORGIVE = 20
     #######################################################################
+
 
     def __init__(
         self,
         title: str,
         all_info: list[list],
-        side_margin=None,
-        top_margin=None,
-        height_buffer=None,
-        bullet_point=None,
+        sec_style: style_info.StyleInfo=None,
+        bullet_point: bool = False,
     ) -> None:
+        if sec_style is None:
+            sec_style = styles.ALlStyles().resume_style_0.subsections[title]
+        
         self.title = title
         self.raw_info_list = all_info
-        self.bullet_point = False
         self.attribute_weight_list = []
         
-        self.all_fonts = fonts.AllFonts()
-        self.font_title = self.all_fonts.name_font
-        self.font_subtitle = self.all_fonts.subsection_title
-        self.font_subright = self.all_fonts.subright_title
-        self.font_text = self.all_fonts.text_font_standard_sec
-        self.side_margin = self.__DEFAULT_SIDE_MARGIN
-        self.top_margin = self.__DEFAULT_TOP_MARGIN
-        self.height_buffer = self.__DEFAULT_HEIGHT_BUFFER
-
-        if bullet_point:
-            self.bullet_point = bullet_point
+        self.section_style = sec_style
+        #self.all_fonts = fonts.AllFonts()
         
-        if height_buffer:
-            self.height_buffer = height_buffer
+        self.font_title_style = self.section_style.subsections["title_font"]
+        self.font_title = self.font_title_style.get_paragraph_style()
+        #self.font_title = self.all_fonts.name_font
+        
+        self.font_subtitle_style = self.section_style.subsections["subtitle_font"]
+        self.font_subtitle = self.font_subtitle_style.get_paragraph_style()
+        #self.font_subtitle = self.all_fonts.subsection_title
+        
+        self.font_subright_style = self.section_style.subsections["subright_font"]
+        self.font_subright = self.font_subright_style.get_paragraph_style()
+        #self.font_subright = self.all_fonts.subright_title
+        
+        self.font_text_style = self.section_style.subsections["standard_text_font"]
+        self.font_text = self.font_text_style.get_paragraph_style()
+       # self.font_text = self.all_fonts.text_font_standard_sec
+       
+        self.side_margin = self.section_style.section_attributes.side_margin
+        #self.side_margin = self.__DEFAULT_SIDE_MARGIN
+        
+        self.top_margin = self.section_style.section_attributes.top_margin
+        #self.top_margin = self.__DEFAULT_TOP_MARGIN
+        
+
+        self.bullet_point = bullet_point
+        #if bullet_point:self.bullet_point = bullet_point
+        
+        self.height_buffer = self.section_style.section_attributes.height_buffer
+        #if height_buffer:self.height_buffer = height_buffer
         if self.bullet_point:
             self.info_list, self.attribute_weight_list = self.parse_bullet()
         else:
             self.info_list, self.attribute_weight_list = self.parse_regular()
 
-        if side_margin:
-            self.side_margin = side_margin
-        if top_margin:
-            self.top_margin = top_margin
-
+        self.wrap_forgive = self.section_style.section_attributes.wrap_forgive
         self.total_height, self.empty_height, self.sub_height_list = (
             self.get_height_section()
         )
@@ -77,8 +93,9 @@ class StandardSection:
         """
         result_list = []
         attribute_list = []
-
         bull_0 = "• "
+        if self.section_style.section_attributes.bullet_symbol is not None:
+            bull_0 = self.section_style.section_attributes.bullet_symbol
         bull_1 = "<br/>"
         for row in self.raw_info_list:
             attribute_item_list = []
@@ -158,11 +175,12 @@ class StandardSection:
         subsection = self.info_list[sec_index]
         total_h = 0
         # subsection title, MUST BE one line:
-        total_h += self.font_subright.leading
+        total_h += self.font_subright_style.font_attributes.leading
+        total_h += self.font_subtitle_style.font_attributes.space_before
         # content: handle both paragraph and bullet points
 
         if self.bullet_point:
-            line_width = A4[0] - 2 * self.side_margin - self.__WRAP_FORGIVE - 25
+            line_width = A4[0] - 2 * self.side_margin - self.wrap_forgive - 20
             num_of_len = 0
             content_start = 0
             for n in range(len(self.raw_info_list[sec_index])):
@@ -186,11 +204,11 @@ class StandardSection:
             total_width = stringWidth(
                 subsection[2], self.font_text.fontName, self.font_text.fontSize
             )
-            line_width = A4[0] - 2 * self.side_margin - self.__WRAP_FORGIVE
+            line_width = A4[0] - 2 * self.side_margin - self.wrap_forgive
             num_of_lines = (total_width // line_width) + 1
             sub_text_height = num_of_lines * self.font_text.leading
             total_h += sub_text_height
-            total_h += self.font_subtitle.spaceBefore
+            total_h += self.font_subtitle_style.font_attributes.space_before
         return total_h
 
     def get_height_subsection_list(self, sec_list: list) -> int:
@@ -201,10 +219,11 @@ class StandardSection:
         subsection = sec_list
         total_h = 0
         # subsection title, MUST BE one line:
-        total_h += self.font_subright.leading
+        total_h += self.font_subright_style.font_attributes.leading
+        total_h += self.font_subtitle_style.font_attributes.space_before
         # content: handle both paragraph and bullet points
         if self.bullet_point:
-            line_width = A4[0] - 2 * self.side_margin - self.__WRAP_FORGIVE - 25
+            line_width = A4[0] - 2 * self.side_margin - self.wrap_forgive - 25
             num_of_len = 0
             content_start = 0
             for n in range(len(sec_list)):
@@ -226,11 +245,11 @@ class StandardSection:
             total_width = stringWidth(
                 subsection[2], self.font_text.fontName, self.font_text.fontSize
             )
-            line_width = A4[0] - 2 * self.side_margin - self.__WRAP_FORGIVE
+            line_width = A4[0] - 2 * self.side_margin - self.wrap_forgive
             num_of_lines = (total_width // line_width) + 1
             sub_text_height = num_of_lines * self.font_text.leading
             total_h += sub_text_height
-        total_h += self.font_subtitle.spaceBefore
+        total_h += self.font_subtitle_style.font_attributes.space_before
         return total_h
 
     def get_height_section(self) -> tuple[int, int, list]:
@@ -241,13 +260,13 @@ class StandardSection:
         """
         total_height = 0
         empty_height = (
-            self.__DEFAULT_HEIGHT_BUFFER + self.top_margin + self.font_title.fontSize
+            self.height_buffer + self.top_margin + self.font_title_style.font_attributes.font_size
         )
-        total_height += self.__DEFAULT_HEIGHT_BUFFER
+        total_height += self.height_buffer
         total_height += self.top_margin
         sub_hlist = []
         # section title:
-        total_height += self.font_title.fontSize
+        total_height += self.font_title_style.font_attributes.font_size
         if self.bullet_point:
             for subsection in self.raw_info_list:
                 total_height += self.get_height_subsection_list(subsection)
