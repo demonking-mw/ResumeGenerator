@@ -62,7 +62,13 @@ class ResumeBuilder:
         Comm: takes in a standard section
         """
         section_content = []
-        section_title_1 = Paragraph(standard_sec.title, standard_sec.font_title)
+        curr_title = standard_sec.title
+        # Edit the title if necessary
+        if curr_title == "PROJECTS":
+            curr_title = "PROJECTS & ACTIVITIES"
+        if curr_title == "EXPERIENCE":
+            curr_title = "WORK EXPERIENCE"
+        section_title_1 = Paragraph(curr_title, standard_sec.font_title)
         section_content.append(section_title_1)
         for content in standard_sec.info_list:
             content_title_1 = Paragraph(content[0], standard_sec.font_subtitle)
