@@ -190,14 +190,24 @@ class ResumeInfo:
     def get_all_skills_att(self) -> list:
         """
         potentially useful in the get_desired_traits
+        gets all skills there exists in the entire resume
         """
         result = []
         print(self.skills_att_list)
         print()
-        for skill in self.skills_att_list:
-            for att in skill[1]:
-                if not any(att in s for s in result):
-                    result.append(att)
+        for skills in self.all_edu_info.attribute_weight_list:
+            for skill_pair in skills:
+                if skill_pair[0] not in result:
+                    result.append(skill_pair[0])
+        for skills in self.all_proj_info.attribute_weight_list:
+            for skill_pair in skills:
+                if skill_pair[0] not in result:
+                    result.append(skill_pair[0])
+        for skills in self.all_exp_info.attribute_weight_list:
+            for skill_pair in skills:
+                if skill_pair[0] not in result:
+                    result.append(skill_pair[0])
+        result = [item for item in result if item != "MANDATORY_INCLUDE"]
         return result
 
     def get_desire(self, gpt_model: str) -> list[list]:
@@ -338,6 +348,7 @@ class ResumeInfo:
         self.sections_mega_list = self.get_mega_list(
             [self.all_edu_info, self.all_exp_info, self.all_proj_info]
         )
+        # Note: the bug is here
         self.all_att_in_skills = self.get_all_skills_att()
         self.desired_skillset = self.get_desire(gpt_model)
         self.resume_selection_list = self.generate_resume_list()
