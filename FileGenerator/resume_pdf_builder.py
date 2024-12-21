@@ -1,6 +1,8 @@
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import Frame, Paragraph, Spacer
+from reportlab.platypus import Frame, Paragraph, Spacer, BaseDocTemplate, PageTemplate
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 import os
 from . import resume_info
 from . import styles
@@ -14,25 +16,28 @@ class ResumeBuilder:
     b.build()
     """
 
-    def build_all_frames(self, frame_heights: list[int]) -> list:
+    def build_all_frames(self, frame_heights: list[int]) -> tuple[list, list]:
         """
         Builds the lists required for making the resume from each data file
+        also return a list of horizontal lines
         """
         result = []
+        lines = []
         total_height = -1
         for frame_h in frame_heights:
             total_height += frame_h
             new_frame = Frame(
-                -1,
+                1,
                 A4[1] - total_height,
-                A4[0] + 2,
+                A4[0] -2,
                 frame_h,
-                leftPadding=self.side_margin + 1,
-                rightPadding=self.side_margin + 1,
-                showBoundary=True,
+                leftPadding=self.side_margin -1,
+                rightPadding=self.side_margin -1,
+                showBoundary=False,
             )
+            lines.append(A4[1] - total_height)
             result.append(new_frame)
-        return result
+        return result, lines
 
     def build_skills(self, skills_info: resume_info.AuxSectionsInfo) -> list:
         """
@@ -91,9 +96,11 @@ class ResumeBuilder:
         ####################################################################################
         # Prepare a canvas object
         c = canvas.Canvas(pdf_path, pagesize=A4)
-        c.setLineWidth(0.3)
+        c.setLineWidth(0.5)
 
-        frames = self.build_all_frames(self.resume_informations.height_list)
+        master_frame = Frame(5, 0, A4[0] - 5, A4[1], showBoundary=True)
+
+        frames, lines_y = self.build_all_frames(self.resume_informations.height_list)
 
         all_contents = []
 
@@ -124,11 +131,10 @@ class ResumeBuilder:
         )
 
         # Add content to frames using canvas
-        frames[0].addFromList(all_contents[0], c)
-        frames[1].addFromList(all_contents[1], c)
-        frames[2].addFromList(all_contents[2], c)
-        frames[3].addFromList(all_contents[3], c)
-        frames[4].addFromList(all_contents[4], c)
+        for i in range(5):
+            frames[i].addFromList(all_contents[i], c)
+            if i < 4:
+                c.line(15, lines_y[i], A4[0] - 15, lines_y[i])
 
         c.save()
         print("all done!")
