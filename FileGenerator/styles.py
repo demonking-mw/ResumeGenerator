@@ -30,7 +30,7 @@ class ALlStyles:
         "subtitle_font": style_info.StyleInfo(font_attributes=style_info.FontAttributes(
             name="subsection_title_font",
             font_name="Times-Bold",
-            font_size=13,
+            font_size=12,
             text_color_hex="#000000",
             alignment=0,
             space_before=5,
@@ -40,7 +40,7 @@ class ALlStyles:
         "subright_font": style_info.StyleInfo(font_attributes=style_info.FontAttributes(
             name="subright_font",
             font_name="Times-Bold",
-            font_size=13,
+            font_size=12,
             text_color_hex="#000000",
             alignment=2,
             space_before=0,
@@ -55,7 +55,7 @@ class ALlStyles:
             alignment=0,
             space_before=0,
             space_after=0,
-            leading=16,
+            leading=14,
         )),
         "heading_name_font": style_info.StyleInfo(font_attributes=style_info.FontAttributes(
             name="name_font",
@@ -70,7 +70,7 @@ class ALlStyles:
         "heading_desc_font": style_info.StyleInfo(font_attributes=style_info.FontAttributes(
             name="personal_info_font",
             font_name="Helvetica",
-            font_size=12,
+            font_size=11,
             text_color_hex="#000000",
             alignment=1,
             space_before=0,
