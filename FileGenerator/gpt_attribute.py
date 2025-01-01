@@ -6,6 +6,8 @@ to get the key and store it in an env file, also put it in environment var.
 """
 
 from openai import OpenAI
+import os
+
 
 
 class GPT_Attribute:
@@ -115,3 +117,25 @@ class GPT_Attribute:
         print()
         self.first_response = self.first_response_dic.content
         self.gpt_modded_list = self.fill_list()
+        self.generate_debug_file()
+
+    def generate_debug_file(self):
+        '''
+        generate a file with gpt informations.
+        '''
+        result = ""
+        result += "QUERY:\n"
+        result += self.get_job_description() + "\n\n"
+        result += "RESPONSE:\n"
+        result += str(self.gpt_modded_list) + "\n\n"
+        result += "FULL RESPONSE:\n"
+        result += str(self.first_response_dic)
+        downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
+        counter = 1
+        while os.path.exists(os.path.join(downloads_folder, f"gpt_debug_{counter}.txt")):
+            counter += 1
+        debug_file_name = f"gpt_debug_{counter}.txt"
+        file_path = os.path.join(downloads_folder, debug_file_name)
+        with open(file_path, "w") as f:
+            f.write(result)
+        
