@@ -102,8 +102,8 @@ class ALlStyles:
     default_section_style_0 =style_info.SectionAttributes(
             side_margin=20,
             top_margin=5,
-            height_buffer=10,
-            wrap_forgive=20,
+            height_buffer=8,
+            wrap_forgive=5,
             bullet_symbol="• ",
             paper_width=A4[0],
         )
