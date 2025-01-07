@@ -122,13 +122,13 @@ class ResumeBuilder:
         all_contents.append(self.build_skills(self.resume_informations.skills_info))
         # Info in the box
         all_contents.append(
-            self.build_standard_content_section(self.resume_informations.edu_info)
-        )
-        all_contents.append(
             self.build_standard_content_section(self.resume_informations.exp_info)
         )
         all_contents.append(
             self.build_standard_content_section(self.resume_informations.proj_info)
+        )
+        all_contents.append(
+            self.build_standard_content_section(self.resume_informations.edu_info)
         )
 
         # Add content to frames using canvas
