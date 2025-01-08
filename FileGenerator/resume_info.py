@@ -365,7 +365,9 @@ class ResumeInfo:
         )
         self.height_list.append(self.get_header_height(self.heading_info))
         self.height_list.append(self.get_skills_height(self.skills_info))
-        self.height_list.append(self.edu_info.total_height)
+        
         self.height_list.append(self.exp_info.total_height)
         self.height_list.append(self.proj_info.total_height)
+        
+        self.height_list.append(self.edu_info.total_height)
         ###############################################################
