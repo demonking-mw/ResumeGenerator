@@ -1,4 +1,5 @@
 from reportlab.lib.pagesizes import A4
+from reportlab import platypus
 from reportlab.platypus import Frame, Paragraph, Spacer, BaseDocTemplate, PageTemplate
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -109,7 +110,7 @@ class ResumeBuilder:
         # Two paragraphs for the header
         custom_space = Spacer(width=0, height=header_container.top_space)
         title_text = Paragraph(header_container.title, self.resume_style.subsections["HEADING"].subsections["heading_name_font"].get_paragraph_style())
-        basic_info_text = Paragraph(
+        basic_info_text = platypus.Paragraph(
             header_container.header_basic_info, self.resume_style.subsections["HEADING"].subsections["heading_desc_font"].get_paragraph_style()
         )
         #self.all_fonts.personal_info_font
