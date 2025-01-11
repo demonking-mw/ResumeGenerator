@@ -9,6 +9,8 @@ python -m FileGenerator.resume_pdf_builder
 To use it: get your own openai api key and put it into a .env under FileGenerator like:
 OPENAI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
+create a python venv and "pip install -r requirements.txt"
+
 Adding items to sections are implemented in file_parse. sample code is commented out, uncomment to use. 
 
 STAGE2:
@@ -25,13 +27,18 @@ STAGE2:
 
 Stage 2 is mostly complete. More testing awaits
 
-STAGE3+:
+STAGE3:
+- Advanced fixes:
+    - migrate to the latex template and update height calculator
+    - migrate to sql database for files
+    - allow users to define their own seciton names and no. of sections
+    - create datatype, behavior, etc. for a general section and have every type of section implement it
+    - find way to calculate/optimize/cook parameters
 - Implement more advanced frontend
     - write cross compare function that compares the same attribute across different items
     - page for visually comparing attribute for different items
     - page to dynamically change attribute 
     - web version with database
-    - publish for paid access 
 - Implement more advanced backend:
     - option to sort items by specific order everytime resume is generated
     - a few more templates
@@ -42,6 +49,8 @@ STAGE3+:
         - past hiring examples of company
         - aims to more accurately outline required traits/skills
 
+Stage 4+:
+    - publish for paid access 
 
 Project Journal 1:
 - Date: 2024-12-06.
